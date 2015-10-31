@@ -10,7 +10,7 @@ import java.util.Date;
  * and open the template in the editor.
  */
 
-public class Task implements Serializable{
+public class Task {
     private String name;
     private String description;
     private Date date;

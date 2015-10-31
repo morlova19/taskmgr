@@ -72,7 +72,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
             }
             else
             {
-                JOptionPane.showMessageDialog(getContentPane(),"Select task");
+                JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
             }
         }
     }
