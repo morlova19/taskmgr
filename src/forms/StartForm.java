@@ -14,17 +14,53 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+/**
+ * StartForm - графический интерфейс для отображения, добавления и удаления задач.
+ * Экземпляр этого класса отображается при запуске приложения.
+ */
 public class StartForm extends JFrame implements ActionListener, MouseListener, ListObserver {
+    /**
+     * Отображает список задач.
+     * По умолчанию, отображает список текущих задач.
+     */
     private JList taskList;
+    /**
+     * Кнопка для вызова окна добавления задачи.
+     */
     private JButton addButton;
+    /**
+     * Компонент для удаления задачи.
+     */
     private JButton deleteButton;
+    /**
+     * Компонент для указания, какой список задач будет отображаться.
+     * Если значение свойства isSelected равно true, то отображается список текущих задач.
+     * По умолчанию, значения свойства isSelected равно true.
+     */
     private JRadioButton current_rb;
+    /**
+     * Если значение свойства isSelected равно true, то отображается список завершенных задач.
+     */
     private JRadioButton completed_rb;
+    /**
+     * Контейнер для компонент.
+     */
     private JPanel mainPanel;
-
+    /**
+     * Управляет формой.
+     */
     IController c ;
+    /**
+     * Предоставляет данные для отображения.
+     */
     IModel m;
-
+    /**
+     * Создает и отображает форму.
+     * Инициализирует IController и IModel.
+     * @param c контроллер
+     * @param m модель
+     * @throws HeadlessException
+     */
     public StartForm(IController c, IModel m) throws HeadlessException {
         setContentPane(mainPanel);
         setTitle("Task manager");
@@ -42,6 +78,10 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         pack();
     }
 
+    /**
+     * Вызывается, когда произошло действие.
+     * @param e событие.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == current_rb)
@@ -76,6 +116,11 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
             }
         }
     }
+
+    /**
+     * Вызывается, когда кликнули на мышь.
+     * @param e событие мыши.
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getSource() == taskList && e.getClickCount() == 2)
@@ -86,27 +131,43 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
             dialog.setEnabled(true);
         }
     }
-
+    /**
+     * Обрабатывает событие нажатия на мышь.
+     * @param e событие.
+     */
     @Override
     public void mousePressed(MouseEvent e) {
 
     }
-
+    /**
+     *
+     * @param e событие.
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
 
     }
-
+    /**
+     *
+     * @param e event
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
 
     }
-
+    /**
+     *
+     * @param e event
+     */
     @Override
     public void mouseExited(MouseEvent e) {
 
     }
 
+    /**
+     * Обновляет список задач на форме.
+     * Вызывается, когда произошли какие-либо изменения, например, добавление задачи.
+     */
     @Override
     public void update() {
         if(m != null)
@@ -122,6 +183,10 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         }
     }
 
+    /**
+     * Показывает диалоговое окно с сообщением о выполнении задачи.
+     * @param task задача, которая произошла.
+     */
     @Override
     public void update(Task task) {
         if(m != null)
