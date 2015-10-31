@@ -15,7 +15,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 /**
- * StartForm - графический интерфейс для отображения, добавления и удаления задач.
+ * Графический интерфейс для отображения, добавления и удаления задач.
  * Экземпляр этого класса отображается при запуске приложения.
  */
 public class StartForm extends JFrame implements ActionListener, MouseListener, ListObserver {

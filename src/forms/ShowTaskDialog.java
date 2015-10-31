@@ -9,6 +9,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Графический интерфейся для просмотра информации о задаче.
+ */
 public class ShowTaskDialog extends JDialog implements ActionListener, TaskObserver {
     private JPanel contentPane;
     private JButton buttonOK;
