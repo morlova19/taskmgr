@@ -5,6 +5,7 @@ import controller.IController;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Date;
 
 public class CreateTaskDialog extends JDialog implements ActionListener {
@@ -31,8 +32,22 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == buttonOK)
         {
-            controller.add(name_tf.getText(), description_tf.getText(), (Date) date_spinner.getValue(), contacts_tf.getText());
-            dispose();
+            if(name_tf.getText().equals(""))
+            {
+                JOptionPane.showMessageDialog(new JFrame(),"Please enter name of task");
+            }
+            else {
+                Date d = (Date) date_spinner.getValue();
+                if(d.getTime() - Calendar.getInstance().getTimeInMillis() < 0)
+                {
+                    JOptionPane.showMessageDialog(new JFrame(),"Please enter correct date of task");
+                }
+                else {
+                    controller.add(name_tf.getText(), description_tf.getText(), d, contacts_tf.getText());
+                    dispose();
+                }
+
+            }
         }
         else if(e.getSource() == buttonCancel)
         {
