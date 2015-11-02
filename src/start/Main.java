@@ -7,6 +7,6 @@ public class Main {
     public static void main(String[] args) {
         String path = "files/";
         //IModel model = new Model(new JournalManager(path));
-       // IController controller = new Controller(model);
+       //IController controller = new Controller(model);
     }
 }

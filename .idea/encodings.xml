@@ -1,29 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/src/controller/Controller.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/images" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/controller/Controller.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/controller/IController.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/controller/IController.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/CreateTaskDialog.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/CreateTaskDialog.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/CreateTaskDialog.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/CreateTaskDialog.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/ShowTaskDialog.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/ShowTaskDialog.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/ShowTaskDialog.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/ShowTaskDialog.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/StartForm.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/StartForm.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/StartForm.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/StartForm.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/forms/StartForm.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/model/IModel.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/model/IModel.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/model/Journal.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/model/JournalManager.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/model/Model.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/model/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/model/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/ListObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/MessageObserver.java" charset="UTF-8" />

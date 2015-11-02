@@ -4,6 +4,7 @@ import forms.StartForm;
 import model.IModel;
 import model.Task;
 
+import java.io.IOException;
 import java.util.Date;
 
 public class Controller implements IController {
@@ -11,7 +12,7 @@ public class Controller implements IController {
     private IModel model;
 
 
-    public Controller(IModel model) {
+    public Controller(IModel model) throws IOException {
         this.model = model;
         startForm = new StartForm(this, model);
         model.load();

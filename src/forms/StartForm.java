@@ -6,19 +6,19 @@ import model.Task;
 import observer.ListObserver;
 import start.Main;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
  * Графический интерфейс для отображения, добавления и удаления задач.
  * Экземпляр этого класса отображается при запуске приложения.
  */
-public class StartForm extends JFrame implements ActionListener, MouseListener, ListObserver {
+public class StartForm extends JFrame implements ActionListener, MouseListener, WindowListener, ListObserver {
     /**
      * Отображает список задач.
      * По умолчанию, отображает список текущих задач.
@@ -29,7 +29,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
      */
     private JButton addButton;
     /**
-     * Компонент для удаления задачи.
+     * Компонент для удаления выбранной задачи.
      */
     private JButton deleteButton;
     /**
@@ -43,7 +43,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
      */
     private JRadioButton completed_rb;
     /**
-     * Контейнер для компонент.
+     * Контейнер для компонентов формы.
      */
     private JPanel mainPanel;
     /**
@@ -55,13 +55,32 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
      */
     IModel m;
     /**
+     * Системный трей.
+     */
+    private SystemTray tray;
+    /**
+     * Иконка, которая будет отображаться в системной трее.
+     */
+    private TrayIcon trayIcon;
+    /**
+     * Элемент меню для открытия формы.
+     */
+    private MenuItem openItem;
+    /**
+     * Элемент меню для закрытия приложения.
+     */
+    private MenuItem exitItem;
+    /**
      * Создает и отображает форму.
-     * Инициализирует IController и IModel.
+     * Инициализирует поля IController и IModel.
      * @param c контроллер
      * @param m модель
-     * @throws HeadlessException
+     * @throws HeadlessException будет брошено, когда код, который зависит от клавиатуры, дисплея или мыши
+     * вызывается в среде, которая не поддерживает клавиатуру, дисплей или мышь.
+     * @throws IOException будет брошено, если произошла ошибка ввода/вывода.
      */
-    public StartForm(IController c, IModel m) throws HeadlessException {
+    public StartForm(IController c, IModel m) throws HeadlessException, IOException {
+
         setContentPane(mainPanel);
         setTitle("Task manager");
         addButton.addActionListener(this);
@@ -73,13 +92,30 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         this.c = c;
         this.m = m;
         m.registerListObserver(this);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        if(SystemTray.isSupported())
+        {
+            tray = SystemTray.getSystemTray();
+            Image img = ImageIO.read(new File("images/bulb.gif"));
+            PopupMenu popupMenu = new PopupMenu();
+            exitItem = new MenuItem("Exit");
+            openItem = new MenuItem("Open");
+            popupMenu.add(openItem);
+            popupMenu.add(exitItem);
+            exitItem.addActionListener(this);
+            openItem.addActionListener(this);
+            trayIcon = new TrayIcon(img, "Task manager",popupMenu);
+            trayIcon.setImageAutoSize(true);
+        }
+        addWindowListener(this);
+        //setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         pack();
     }
 
     /**
      * Вызывается, когда произошло действие.
+     * Например, была нажата кнопка Добавить, Удалить и т.д.
      * @param e событие.
      */
     @Override
@@ -115,10 +151,19 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
                 JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
             }
         }
+        else if(e.getSource() == openItem)
+        {
+            setVisible(true);
+            tray.remove(trayIcon);
+        }
+        else if(e.getSource() == exitItem)
+        {
+            System.exit(0);
+        }
     }
 
     /**
-     * Вызывается, когда кликнули на мышь.
+     * Вызывается, когда кнопка мыши была нажата (нажата и отпущена) на компоненте.
      * @param e событие мыши.
      */
     @Override
@@ -132,7 +177,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         }
     }
     /**
-     * Обрабатывает событие нажатия на мышь.
+     * Вызывается, когда кнопка мыши была нажата на компоненте.
      * @param e событие.
      */
     @Override
@@ -140,7 +185,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
 
     }
     /**
-     *
+     * Вызывается, когда кнопка мыши была отпущена на компоненте.
      * @param e событие.
      */
     @Override
@@ -148,22 +193,21 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
 
     }
     /**
-     *
-     * @param e event
+     * Вызывается, когда курсор мыши был наведен на компонент.
+     * @param e событие
      */
     @Override
     public void mouseEntered(MouseEvent e) {
 
     }
     /**
-     *
-     * @param e event
+     * Вызывается, когда курсор мыши был убран с компонента.
+     * @param e событие
      */
     @Override
     public void mouseExited(MouseEvent e) {
 
     }
-
     /**
      * Обновляет список задач на форме.
      * Вызывается, когда произошли какие-либо изменения, например, добавление задачи.
@@ -184,7 +228,8 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
     }
 
     /**
-     * Показывает диалоговое окно с сообщением о выполнении задачи.
+     * Отображает диалоговое окно о выполнении задачи.
+     * Предоставляет возможность завершить или отложить задачу.
      * @param task задача, которая произошла.
      */
     @Override
@@ -213,5 +258,70 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         }
     }
 
+    /**
+     * Вызывается, когда окно видимо.
+     * @param e
+     */
+    @Override
+    public void windowOpened(WindowEvent e) {
 
+    }
+    /**
+     * Вызывается при закрытии окна.
+     * @param e событие
+     */
+    @Override
+    public void windowClosing(WindowEvent e) {
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e1) {
+
+        }
+        setVisible(false);
+    }
+    /**
+     * Вызывается, когда окно закрыто.
+     * @param e событие
+     */
+    @Override
+    public void windowClosed(WindowEvent e) {
+
+    }
+    /**
+     * Вызывается при сворачивании окна.
+     * @param e событие
+     */
+    @Override
+    public void windowIconified(WindowEvent e) {
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e1) {
+
+        }
+        setVisible(false);
+    }
+    /**
+     * Вызывается при возвращении окна из свернутого состояния в нормальное.
+     * @param e событие
+     */
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+
+    }
+    /**
+     * Вызывается, когда окно активно.
+     * @param e
+     */
+    @Override
+    public void windowActivated(WindowEvent e) {
+
+    }
+    /**
+     * Вызывается, когда окно не активно.
+     * @param e
+     */
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+
+    }
 }
