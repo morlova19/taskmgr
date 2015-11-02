@@ -7,6 +7,7 @@ package observer;
  * информацию о запрашиваемой задаче.
  */
 public interface TaskObserver {
+
     void update(int id);
 
 }
