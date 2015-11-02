@@ -23,6 +23,13 @@ public class Task {
         this.contacts = contacts;
     }
 
+    public Task(Task task) {
+        this.name = task.name;
+        this.description = task.description;
+        this.date = task.date;
+        this.contacts = task.contacts;
+    }
+
     public String getName() {
         return name;
     }
