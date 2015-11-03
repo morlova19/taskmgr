@@ -31,7 +31,7 @@ public class Journal implements Serializable {
         else currentTasks.remove(task);
     }
 
-    void delayTask(Task task) {             // откладывает задачу на одну минуту
+    void delayTask(Task task) {// откладывает задачу на одну минуту
         Date date = task.getDate();
         date.setTime(date.getTime()+60000);
         task.setDate(date);
