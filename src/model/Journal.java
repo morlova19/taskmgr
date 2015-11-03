@@ -3,9 +3,7 @@ package model;
 import start.Main;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Part of taskmgr.
@@ -14,7 +12,6 @@ public class Journal implements Serializable {
 
     private Vector<Task> currentTasks;
     private Vector<Task> completedTasks;
-
 
     Task getTask(int index) {
         if (Main.CURRENT == Main.COMPLETED) return completedTasks.elementAt(index);
@@ -61,11 +58,24 @@ public class Journal implements Serializable {
         this.completedTasks = completedTasks;
     }
 
-    /*void reload() {   // для чего?
+    void reload() {
+        if(!currentTasks.isEmpty())
+        {
+            Iterator iterator = currentTasks.listIterator();
+            while(iterator.hasNext())
+            {
+                Task t = (Task) iterator.next();
+                long delta = t.getDate().getTime() - Calendar.getInstance().getTimeInMillis();
+                if(delta <= 0)
+                {
+                    iterator.remove();
+                    completedTasks.add(t);
+                }
+            }
+        }
+    }
 
-    }*/
-
-    ArrayList<String> getNames() {                   //Нужно следить за порядком следования
+    ArrayList<String> getNames() { //Нужно следить за порядком следования
         ArrayList<String> names = new ArrayList<>();
         if (Main.CURRENT == Main.COMPLETED)
             for(Task task: completedTasks) {

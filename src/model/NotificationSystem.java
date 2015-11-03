@@ -2,16 +2,12 @@ package model;
 
 import observer.MessageObserver;
 
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Part of taskmgr.
  */
 public class NotificationSystem {
-
     private class NotifyTask extends TimerTask {
         private MessageObserver observer;
         private Task task;
@@ -20,35 +16,45 @@ public class NotificationSystem {
             task = t;
             observer = o;
         }
-
         public void  run() {
             observer.update(task);
         }
     }
-
-    private Map<Task, Timer> map;
     private MessageObserver mObserver;
+    private Map<Task, Timer> map;
 
     NotificationSystem(Journal journal) {
-        Vector<Task> tasks = journal.getCurrentTasks();
-        for (Task task: tasks) {
-            startTask(task);
+        map = new HashMap<>();
+        Iterator iterator = journal.getCurrentTasks().iterator();
+        while(iterator.hasNext())
+        {
+            startTask((Task) iterator.next());
         }
     }
 
     void startTask(Task task) {
         Timer t = new Timer();
+        map.put(task,t);
         NotifyTask nTask = new NotifyTask(task, mObserver);
         t.schedule(nTask, task.getDate());
     }
 
     void cancelTask(Task task) {
-        map.get(task).cancel();
+        Timer timer =  map.get(task);
+        timer.cancel();
+        map.remove(task);
     }
 
+    public void delayTask(Task t)
+    {
+        Timer timer =  map.get(t);
+        NotifyTask nTask = new NotifyTask(t, mObserver);
+        timer.schedule(nTask, t.getDate());
+    }
     void registerObserver(MessageObserver o) {
         mObserver = o;
     }
+
 
     /*void notifyObserver(Task task) {
         if (mObserver != null) mObserver.update(task);

@@ -1,18 +1,24 @@
 package model;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Vector;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Part of taskmgr.
@@ -20,27 +26,36 @@ import java.util.Vector;
 
 public class JournalManager {
 
-    private String filepath;
-    private String filename; // Зачем?
+    private String dir;
+    private String cur_filename;
+    private String comp_filename;
 
-    JournalManager(String path) {
-        filepath = path;
-        filename = "tasks";
+    public JournalManager(String path) {
+        if(!new File(path).exists())
+        {
+            File dir = new File(path);
+            dir.mkdir();
+        }
+        this.dir = path;
+        cur_filename = dir +"tasks_current.xml";
+        comp_filename = dir +"tasks_completed.xml";
+       // dir = path;
+
     }
 
-    void writeJournal(Journal journal) {
+    void writeJournal(Journal journal) throws IOException {
         Vector<Task> tasks = journal.getCurrentTasks();
-        write(new File(filepath+filename+".xml"), tasks);
+        write(new File(cur_filename), tasks);
         tasks = journal.getCompletedTasks();
-        write(new File(filepath+filename+"_completed.xml"), tasks);
+        write(new File(comp_filename), tasks);
     }
 
     Journal readJournal() {
         Journal journal = new Journal();
         try {
-            Vector<Task> tasks = read(new File(filepath + filename + ".xml"));
+            Vector<Task> tasks = read(new File(cur_filename));
             journal.setCurrentTasks(tasks);
-            tasks = read(new File(filepath + filename + "_completed.xml"));
+            tasks = read(new File(comp_filename));
             journal.setCompletedTasks(tasks);
         } catch (Exception e) {
             //обрабатывать здесь либо в Model
@@ -48,20 +63,20 @@ public class JournalManager {
         return journal;
     }
 
-    void write(File file, Vector<Task> tasks) {
+    void write(File file, Vector<Task> tasks) throws IOException {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document document = builder.newDocument();
             Element rootElement = document.createElement("tasks");
             document.appendChild(rootElement);
-            Element taskElement = document.createElement("task");
-            Element nameEl = document.createElement("name");
-            Element descEl = document.createElement("desc");
-            Element dateEl = document.createElement("task");
-            Element contactsEl = document.createElement("contacts");
             DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, new Locale("ru","RU"));
             for(Task t: tasks) {
+                Element taskElement = document.createElement("task");
+                Element nameEl = document.createElement("name");
+                Element descEl = document.createElement("desc");
+                Element dateEl = document.createElement("date");
+                Element contactsEl = document.createElement("contacts");
                 nameEl.setTextContent(t.getName());
                 descEl.setTextContent(t.getDescription());
                 dateEl.setTextContent(df.format(t.getDate()));
@@ -85,15 +100,19 @@ public class JournalManager {
             e.printStackTrace();
         }
 
+
     }
 
     Vector<Task> read(File file) throws ParseException {
-        Vector<Task> tasks = new Vector<Task>();
-
+        Vector<Task> tasks = new Vector<>();
+        if(!file.exists())
+        {
+            return tasks;
+        }
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse("test.xml");
+            Document document = builder.parse(file);
             NodeList taskList = document.getElementsByTagName("task");
             for (int i = 0; i < taskList.getLength(); i++) {
                 NodeList taskFields = taskList.item(i).getChildNodes();
@@ -122,12 +141,13 @@ public class JournalManager {
                 }
                 tasks.add(new Task(name, desc, date, contacts));
             }
+
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+
         } catch (IOException e) {
-            e.printStackTrace();
+
         } catch (SAXException e) {
-            e.printStackTrace();
+
         }
 
         return tasks;
