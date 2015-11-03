@@ -108,7 +108,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
             trayIcon.setImageAutoSize(true);
         }
         addWindowListener(this);
-        //setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         pack();
     }
@@ -124,13 +124,21 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         {
             addButton.setEnabled(true);
             Main.CURRENT = Main.NOTCOMPLETED;
-            c.load();
+            try {
+                c.load();
+            } catch (IOException e1) {
+
+            }
         }
         else if (e.getSource() == completed_rb)
         {
             addButton.setEnabled(false);
             Main.CURRENT = Main.COMPLETED;
-            c.load();
+            try {
+                c.load();
+            } catch (IOException e1) {
+
+            }
         }
         else if(e.getSource() == addButton)
         {
@@ -239,7 +247,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
             String message = "Name: " + task.getName() + "\n" +
                     "Description : " + task.getDescription() +
                     "\n" + "Contacts :" + task.getContacts();
-            String[] options = {"delay", "finish"};
+            String[] options = {"delay", "complete"};
 
             int answer = JOptionPane.showOptionDialog(new JFrame(), message,
                     "Notification",
@@ -253,7 +261,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
                 c.delay(task);
             }
             else {
-                c.load();
+                c.complete(task);
             }
         }
     }
@@ -272,12 +280,12 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
      */
     @Override
     public void windowClosing(WindowEvent e) {
-        try {
+       /* try {
             tray.add(trayIcon);
         } catch (AWTException e1) {
 
         }
-        setVisible(false);
+        setVisible(false);*/
     }
     /**
      * Вызывается, когда окно закрыто.

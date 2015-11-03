@@ -25,8 +25,9 @@ public class Controller implements IController {
      */
     public Controller(IModel model) throws IOException {
         this.model = model;
-        startForm = new StartForm(this, model);
-        model.load();
+        startForm = new StartForm(this,model);
+        load();
+       // model.load();
         startForm.setVisible(true);
     }
 
@@ -42,7 +43,7 @@ public class Controller implements IController {
     }
 
     @Override
-    public void load() {
+    public void load() throws IOException {
         model.load();
     }
     @Override
@@ -53,6 +54,10 @@ public class Controller implements IController {
     public void delay(Task t) {
         model.delay(t);
     }
-
+    @Override
+    public void complete(Task t)
+    {
+        model.complete(t);
+    }
 
 }

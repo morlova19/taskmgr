@@ -2,6 +2,7 @@ package controller;
 
 import model.Task;
 
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -30,7 +31,7 @@ public interface IController {
     /**
      * Вызывается, когда необходимо загрузить список задач в форму.
      */
-    void load();
+    void load() throws IOException;
     /**
      * Вызывается, когда нужно отображить информацию о задаче.
      * @param id номер задачи в списке задач.
@@ -41,4 +42,9 @@ public interface IController {
      * @param t задача, которую нужно отложить.
      */
     void delay(Task t);
+    /**
+     * Вызывается, когда нужно завершить задачу.
+     * @param t задача, которую нужно завершить.
+     */
+    void complete(Task t);
 }

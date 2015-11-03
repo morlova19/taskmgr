@@ -11,6 +11,8 @@
     <file url="file://$PROJECT_DIR$/src/forms/StartForm.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/StartForm.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/model/IModel.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/model/Model.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/model/NotificationSystem.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/model/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/ListObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/MessageObserver.java" charset="UTF-8" />
