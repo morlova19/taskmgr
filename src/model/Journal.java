@@ -15,7 +15,6 @@ public class Journal implements Serializable {
     /*уникальный id задачи, который будет генерироваться (инкрементироваться)
     Можно будет куда-то в другое место его убрать отсюда,
     но я пока не знаю куда лучше. Можно, например, будет сдать класс GeneratorID */
-
     private static int generatedID;
 
     public static int getGeneratedID() {
