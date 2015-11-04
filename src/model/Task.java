@@ -1,83 +1,94 @@
 package model;
 
+import to.TransferObject;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Задача для выполнения.
- * Имеет 4 параметра: имя, описание, дата выполнения, контакты.
+ * A task that will be executed at a specified time.
+ * The task has 4 parameters such as name, description, date of execution, contacts.
  */
-
 public class Task {
     /**
-     * Имя задачи.
+     * Name of the task.
      */
     private String name;
     /**
-     * Описание задачи.
+     * Description of the task.
      */
     private String description;
     /**
-     * Время выполнения задачи.
+     * Time of execution of the task.
      */
     private Date date;
     /**
-     * Контакты.
+     * Contacts.
      */
     private String contacts;
-
     /**
-     * Создает задачу с заданными параметрами.
-     * @param name имя
-     * @param description описание
-     * @param date дата
-     * @param contacts контакты
+     * Identifier of the task.
      */
-    public Task(String name, String description, Date date, String contacts) {
-        this.name = name;
-        this.description = description;
-        this.date = date;
-        this.contacts = contacts;
+    private int ID;
+    /**
+     * Creates a task with the given parameters.
+     * @param data object that contains parameters of the task.
+     */
+    public Task(TransferObject data) {
+        this.name = data.getName();
+        this.description = data.getDescription();
+        this.date = data.getDate();
+        this.contacts = data.getContacts();
+        this.ID = data.getId();
     }
-
     /**
-     * Возвращает имя задачи.
-     * @return имя задачи.
+     * Gets name of the task.
+     * @return name of the task.
      */
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
-
     /**
-     * Возвращает описание задачи.
-     * @return описание.
+     *  Gets description of the task.
+     * @return description of the task.
      */
-    public String getDescription() {
+    public synchronized String getDescription() {
         return description;
     }
-
     /**
-     * Возвращает дату выполнения.
-     * @return дата.
+     *  Gets date of execution of the task.
+     * @return date of execution.
      */
-    public Date getDate() {
+    public synchronized Date getDate() {
         return date;
     }
-
     /**
-     * Возвращает контакты.
-     * @return контакты.
+     * Gets contacts.
+     * @return contacts.
      */
-    public String getContacts() {
+    public synchronized String getContacts() {
         return contacts;
     }
-
     /**
-     * Устанавливает новую дату выполнения задачи.
-      * @param date новая дата выполнения.
+     * Sets new date of execution of the task.
+     * @param date new date.
      */
-    public void setDate(Date date) {
+    public synchronized void setDate(Date date) {
         this.date = date;
     }
+    /**
+     * Gets identifier of the task.
+     * @return identifier.
+     */
+    public synchronized int getID() {
+        return ID;
+    }
+    @Override
+    public synchronized String toString() {
+        String s = "Name : " + this.name + "\n"
+                + "Description: " + this.description+"\n"
+                + "Contacts : " + this.contacts + "\n";
+        return s;
+    }
+
+
 }

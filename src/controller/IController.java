@@ -1,27 +1,22 @@
 package controller;
 
 import model.Task;
+import to.TransferObject;
 
 import java.io.IOException;
 import java.util.Date;
 
 /**
- * Интерфейс контроллера.
- * Контроллер управляет работой с формой и с данными,
- * т.е. с моделью.
- * Получает какие-либо сведения о событии, произошедшем на форме
- * и сообщает об этом модели.
+ * Interface of controller.
+ * Controller controls the work with form and model.
  */
 public interface IController {
     /**
-     * Вызывается, если была нажата кнопка добавить на форме.
+     * invoked when a button to add was pressed.
+     *
      * Принимает введенные пользователем параметры новой задачи.
-     * @param name имя.
-     * @param desc описание.
-     * @param date дата выполнения.
-     * @param contacts контакты.
      */
-    void add(String name, String desc, Date date, String contacts);
+    void add(TransferObject data);
     /**
      * Вызывается, если на форме была нажата кнопка удалить.
      * Принимает номер выбранное задачи в списке задач.
@@ -31,7 +26,7 @@ public interface IController {
     /**
      * Вызывается, когда необходимо загрузить список задач в форму.
      */
-    void load() throws IOException;
+    void load();
     /**
      * Вызывается, когда нужно отображить информацию о задаче.
      * @param id номер задачи в списке задач.
@@ -41,7 +36,7 @@ public interface IController {
      * Вызывается, когда нужно отложить задачу.
      * @param t задача, которую нужно отложить.
      */
-    void delay(Task t);
+    void delay(Task t, Date newDate);
     /**
      * Вызывается, когда нужно завершить задачу.
      * @param t задача, которую нужно завершить.

@@ -1,49 +1,70 @@
 package controller;
 
+import forms.MessageDialog;
 import forms.StartForm;
 import model.IModel;
 import model.Task;
+import ns.NotificationSystem;
+import observer.TaskObserver;
+import start.Main;
+import to.TransferObject;
 
-import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 
-public class Controller implements IController {
+public class Controller implements IController, TaskObserver {
     /**
-     * Стартовый графический интерфейс приложения.
+     * Starting GUI of application.
      */
     private StartForm startForm;
     /**
-     * Модель, которая работает с данными.
+     * Model that works with data.
      */
     private IModel model;
 
+    private NotificationSystem nSystem;
+    
+    private TaskObserver mObserver;
     /**
-     * Создает экземпляр класса, инициализирует поля.
-     * Запускает стартовую форму.
-     * @param model модель.
-     * @throws IOException ошибка ввода/вывода.
+     * Constructs new controller.
+     * Creates and displays GUI.
+     * @param model model.
      */
-    public Controller(IModel model) throws IOException {
-        this.model = model;
+    public Controller(IModel model, NotificationSystem nSystem)  {
+        if(model != null)
+        {
+            this.model = model;
+        }
         startForm = new StartForm(this,model);
         load();
+        if(nSystem != null) {
+            this.nSystem = nSystem;
+            nSystem.registerObserver(this);
+        }
        // model.load();
         startForm.setVisible(true);
     }
 
     @Override
-    public void add(String name, String desc, Date date, String contacts) {
-        model.add(name, desc, date, contacts);
+    public void add(TransferObject data) {
+        Task t = new Task(data);
+        model.add(t);
+        nSystem.startTask(t.getID());
     }
 
     @Override
     public void delete(int id)
     {
-         model.delete(id);
+        //Task t = model.get(id);
+        model.delete(id);
+        if(Main.CURRENT == Main.NOTCOMPLETED) {
+            nSystem.cancelTask(id);
+        }
+
     }
 
     @Override
-    public void load() throws IOException {
+    public void load() {
         model.load();
     }
     @Override
@@ -51,8 +72,9 @@ public class Controller implements IController {
        model.show(id);
     }
     @Override
-    public void delay(Task t) {
-        model.delay(t);
+    public void delay(Task t, Date newDate) {
+        model.delay(t,newDate);
+        nSystem.delayTask(t.getID());
     }
     @Override
     public void complete(Task t)
@@ -60,4 +82,9 @@ public class Controller implements IController {
         model.complete(t);
     }
 
+    @Override
+    public void update(int id) {
+        mObserver = new MessageDialog(this,model);
+        mObserver.update(id);
+    }
 }
