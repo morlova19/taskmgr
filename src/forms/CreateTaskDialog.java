@@ -1,97 +1,110 @@
 package forms;
 
 import controller.IController;
+import model.Journal;
+import to.TransferObject;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Графический интерфейся для создания задачи.
- * Содержит комненты для вводы имени, описания, даты и контактов задачи.
+ * GUI for creating new task.
+ * Contains components for entering the name, description, date and contacts of new task.
  */
 public class CreateTaskDialog extends JDialog implements ActionListener {
     /**
-     * Контейнер для компонентов.
+     * Container for components.
      */
     private JPanel contentPane;
     /**
-     * Кнопка для подтверждения добавления.
+     * Button to confirm adding of new task.
      */
     private JButton buttonOK;
     /**
-     * Кнопка для отмены добавления.
+     * Button to cancel adding of new task.
      */
     private JButton buttonCancel;
     /**
-     * Поле для ввода имени задачи.
+     * Field for entering name of task.
      */
     private JTextField name_tf;
     /**
-     * Поле для ввода описания задачи.
+     * Field for entering description of task.
      */
     private JTextArea description_tf;
     /**
-     * Компонент для ввода даты выполнения задачи.
+     * Field for entering date of execution of task.
      */
     private JSpinner date_spinner;
     /**
-     * Поле для ввода контактов задачи.
+     * Field for entering contacts.
      */
     private JTextArea contacts_tf;
     /**
-     * Управляет диалоговым окном.
+     * Controls this dialog.
      */
     private IController controller;
 
+    private final String OK_ACTION = "OK";
+    private final String CANCEL_ACTION = "Cancel";
+
     /**
-     * Создает и отображает форму.
-     * Инициализирует поле IController.
-     * @param controller контроллер
+     * Constructs and displays dialog window.
+     * @param controller controller that controls this form.
      */
     public CreateTaskDialog(IController controller) {
         this.controller = controller;
         setContentPane(contentPane);
         setTitle("New task");
         buttonOK.addActionListener(this);
+        buttonOK.setActionCommand(OK_ACTION);
         buttonCancel.addActionListener(this);
+        buttonCancel.setActionCommand(CANCEL_ACTION);
         date_spinner.setModel(new SpinnerDateModel());
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
     }
-    /**
-     * Вызывается, когда произошло действие.
-     * Например, если была нажата кнопка ОК или Отмена.
-     * @param e событие.
-     */
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == buttonOK)
+
+        switch (e.getActionCommand())
         {
-            if(name_tf.getText().equals(""))
+            case OK_ACTION:
+                add();
+                break;
+            case CANCEL_ACTION:
+                dispose();
+                break;
+        }
+    }
+
+    private void add() {
+        if(name_tf.getText().equals(""))
+        {
+            JOptionPane.showMessageDialog(new JFrame(), "Please enter name of task");
+        }
+        else {
+            Date date = (Date) date_spinner.getValue();
+            if(date.getTime() - Calendar.getInstance().getTimeInMillis() < 0)
             {
-                JOptionPane.showMessageDialog(new JFrame(),"Please enter name of task");
+                JOptionPane.showMessageDialog(new JFrame(),"Please enter correct date of task");
             }
             else {
-                Date d = (Date) date_spinner.getValue();
-                if(d.getTime() - Calendar.getInstance().getTimeInMillis() < 0)
-                {
-                    JOptionPane.showMessageDialog(new JFrame(),"Please enter correct date of task");
-                }
-                else {
-                    controller.add(name_tf.getText(), description_tf.getText(), d, contacts_tf.getText());
-                    dispose();
-                }
-
+                TransferObject to = new TransferObject();
+                to.setName(name_tf.getText());
+                to.setDescription(description_tf.getText());
+                to.setDate(date);
+                to.setContacts(contacts_tf.getText());
+                to.setId(Journal.getGeneratedID());
+                controller.add(to);
+                dispose();
             }
-        }
-        else if(e.getSource() == buttonCancel)
-        {
-            dispose();
+
         }
     }
 }

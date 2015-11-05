@@ -12,18 +12,37 @@ public class Journal implements Serializable {
 
     private Vector<Task> currentTasks;
     private Vector<Task> completedTasks;
+    /*уникальный id задачи, который будет генерироваться (инкрементироваться)
+    Можно будет куда-то в другое место его убрать отсюда,
+    но я пока не знаю куда лучше. Можно, например, будет сдать класс GeneratorID */
+    private static int generatedID;
+    public static int getGeneratedID() {
+        return generatedID++;
+    }
+    public static void setGeneratedID(int generatedID) {
+        Journal.generatedID = generatedID;
+    }
 
-    Task getTask(int index) {
-        if (Main.CURRENT == Main.COMPLETED) return completedTasks.elementAt(index);
-        else return currentTasks.elementAt(index);
-        //return new Task(currentTasks.elementAt(index));
+    public Task getTask(int index) {
+
+        if (Main.CURRENT == Main.COMPLETED)
+        {
+            return completedTasks.stream()
+                    .filter(task -> task.getID() == index)
+                    .findFirst().get();
+        }
+        else
+        {
+            return currentTasks.stream()
+                    .filter(task -> task.getID() == index)
+                    .findFirst().get();
+        }
     }
 
     void addTask(Task newTask) {
-        //if (Main.CURRENT == Main.COMPLETED) completedTasks.add(newTask);
-        //else
+        if(currentTasks != null) {
             currentTasks.add(newTask);
-        //currentTasks.add(new Task(newTask)); // возможно, лишнее копирование
+        }
     }
 
     void deleteTask(Task task) {
@@ -31,10 +50,12 @@ public class Journal implements Serializable {
         else currentTasks.remove(task);
     }
 
-    void delayTask(Task task) {             // откладывает задачу на одну минуту
-        Date date = task.getDate();
-        date.setTime(date.getTime()+60000);
-        task.setDate(date);
+    void delayTask(int id, Date newDate) {// откладывает задачу на одну минуту
+        Task t = currentTasks
+                .stream()
+                .filter(task -> task.getID() == id)
+                .findFirst().get();
+        t.setDate(newDate);
     }
 
     void setCompleted(Task task) {
@@ -42,23 +63,23 @@ public class Journal implements Serializable {
         completedTasks.add(task);
     }
 
-    Vector<Task> getCurrentTasks() {
+    public Vector<Task> getCurrentTasks() {
         return currentTasks;
     }
 
-    void setCurrentTasks(Vector<Task> currentTasks) {
+    public void setCurrentTasks(Vector<Task> currentTasks) {
         this.currentTasks = currentTasks;
     }
 
-    Vector<Task> getCompletedTasks() {
+    public Vector<Task> getCompletedTasks() {
         return completedTasks;
     }
 
-    void setCompletedTasks(Vector<Task> completedTasks) {
+    public void setCompletedTasks(Vector<Task> completedTasks) {
         this.completedTasks = completedTasks;
     }
 
-    void reload() {
+    public void reload() {
         if(!currentTasks.isEmpty())
         {
             Iterator iterator = currentTasks.listIterator();
@@ -75,16 +96,8 @@ public class Journal implements Serializable {
         }
     }
 
-    ArrayList<String> getNames() { //Нужно следить за порядком следования
-        ArrayList<String> names = new ArrayList<>();
-        if (Main.CURRENT == Main.COMPLETED)
-            for(Task task: completedTasks) {
-                names.add(task.getName());
-            }
-        else
-            for(Task task: currentTasks) {
-                names.add(task.getName());
-            }
-        return names;
+   Vector<Task> getTasks() { //Нужно следить за порядком следования
+       if (Main.CURRENT == Main.COMPLETED) return completedTasks;
+       else return currentTasks;
     }
 }

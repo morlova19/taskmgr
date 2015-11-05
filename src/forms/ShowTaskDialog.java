@@ -11,92 +11,91 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Графический интерфейс для просмотра информации о задаче.
- * Содержит компоненты для отображения имени, описания, даты и контактов задачи.
+ * GUI to view information about the task.
+ * It contains components for displaying task's details.
  */
 public class ShowTaskDialog extends JDialog implements ActionListener, TaskObserver {
     /**
-     * Контейнер для компонентов.
+     * Containter for components.
      */
     private JPanel contentPane;
     /**
-     * Кнопка для подтверждения.
+     * Button to confirm.
      */
     private JButton buttonOK;
     /**
-     * Кнопка для отмены.
+     * Button to cancel.
      */
     private JButton buttonCancel;
     /**
-     * Поле для отображения имени задачи.
+     * Field to display task's name.
      */
     private JTextField name_tf;
     /**
-     * Поле для отображения описания задачи.
+     *  Field to display task's description.
      */
     private JTextArea description_tf;
     /**
-     * Поле для отображения даты выполнения задачи.
+     *  Field to display task's date.
      */
     private JSpinner date_spinner;
     /**
-     * Поле для отображения контактов задачи.
+     * Field to display contacts.
      */
     private JTextArea contacts_tf;
-
     /**
-     * Управляет диалоговым окном.
+     * Controls this dialog.
      */
     IController c;
     /**
-     * Предоставляет данные о задаче для отображения.
+     * Provides task's details to display.
      */
     IModel m;
+
+    private final String OK_ACTION = "OK";
+    private final String CANCEL_ACTION = "Cancel";
+
     /**
-     * Создает и отображает форму.
-     * Инициализирует поля IController и IModel.
-     * @param c контроллер
-     * @param m модель
+     * Creates and displays dialog.
+     * @param c controller.
+     * @param m model.
      */
-    public ShowTaskDialog(IController c, IModel m) {
+    public ShowTaskDialog(IController c, IModel m, int id) {
         this.c = c;
         this.m = m;
         m.registerTaskObserver(this);
         setContentPane(contentPane);
         date_spinner.setModel(new SpinnerDateModel());
         buttonOK.addActionListener(this);
+        buttonOK.setActionCommand(OK_ACTION);
         buttonCancel.addActionListener(this);
+        buttonCancel.setActionCommand(CANCEL_ACTION);
+        c.show(id);
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
     }
-
-    /**
-     * Вызывается, когда произошло действие.
-     * Например, если была нажата кнопка ОК или Отмена.
-     * @param e событие.
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == buttonOK)
+
+        switch (e.getActionCommand())
         {
-            dispose();
-        }
-        else if(e.getSource() == buttonCancel)
-        {
-            dispose();
+            case OK_ACTION:
+                dispose();
+                break;
+            case CANCEL_ACTION:
+                dispose();
+                break;
         }
     }
-
     /**
-     * Получает информацию о задаче и заполняет поля формы этими данными.
-     * @param id номер задачи. по которому она будет найдена в списке задач.
+     * Gets task's details and fills fields of this form.
+     * @param id id of the task whose details will be displayed.
      */
     @Override
     public void update(int id) {
         Task t = m.get(id);
-        if(t != null)
-        {
+        if(t != null) {
             name_tf.setText(t.getName());
             description_tf.setText(t.getDescription());
             date_spinner.setValue(t.getDate());

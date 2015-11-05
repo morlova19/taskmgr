@@ -2,69 +2,71 @@ package model;
 
 import observer.ListObserver;
 import observer.TaskObserver;
+import to.TransferObject;
 
-import java.io.IOException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Vector;
 
 /**
- * Интерфейс модели.
- * Предоставляет методы для работы с данными такие, как
- * добавление, удаление и изменение данных.
- * А также сообщает форме (своему наблюдателю) о том, что данные изменились.
+ * The Model provides methods for working with data, such as
+ * adding, deleting and changing data.
  */
 public interface IModel {
     /**
-     * Добавление данных.
-     * @param name имя.
-     * @param desc описание.
-     * @param date дата.
-     * @param contacts контакты.
+     * Adding data.
+     * @param task data for adding.
      */
-    void add(String name, String desc, Date date, String contacts);
+    void add(Task task) throws TransformerException, ParserConfigurationException;
     /**
-     * Удаление данных.
-     * @param id номер задачи в списке задач.
+     * Deleting data.
+     * @param id id of task.
      */
-    void delete(int id);
+    void delete(int id) throws TransformerException, ParserConfigurationException;
     /**
-     * Возвращает список имен задач.
-     * @return список имен.
+     * Gets list of data.
+     * @return list of data..
      */
-    ArrayList<String> getData();
+    Vector<Task> getData();
     /**
-     * Метод для регистарции наблюдателя.
-     * @param o наблюдатель.
+     * Method to register ListObserver object.
+     * @param o observer.
+     * @see ListObserver
      */
     void registerListObserver(ListObserver o);
     /**
-     * Метод для регистарции наблюдателя.
-     * @param o наблюдатель.
+     * Method to register TaskObserver object.
+     * @param o observer.
+     * @see TaskObserver
      */
     void registerTaskObserver(TaskObserver o);
     /**
-     * Возвращает задачу по номеру из списка задач.
-     * @param id номер задачи.
-     * @return найденная задача.
+     * Gets the task by identifier.
+     * Returns null if the task was not found.
+     * @param id identifier of the task.
+     * @return task that was found.
      */
     Task get(int id);
     /**
-     * Загружает информацию о задаче, полученной по номеру из списка.
-     * @param id номер задачи, информация о которой будет загружена.
+     * Loads information about the task which has the given identifier.
+     * @param id identifier of the task.
      */
     void show(int id);
     /**
-     * Загружает список задач.
+     * Loads the list of the tasks.
      */
-    void load() throws IOException;
+    void load();
     /**
-     * Вызывается, когда задачу нужно отложить.
-     * @param t задача, которая откладывается.
+     * Invokes for delaying the task.
+     * @param id identifier of the task that will be delayed.
+     * @param newDate new date of execution of the task.
      */
-    void delay(Task t);
+    void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException;
     /**
-     * Вызывается, когда задачу нужно завершить.
-     * @param t задача, которая завершена.
+     * Invokes to complete the task.
+     * @param t task that will be completed.
      */
-    void complete(Task t);
+    void complete(Task t) throws TransformerException, ParserConfigurationException;
 }

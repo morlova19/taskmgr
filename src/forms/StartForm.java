@@ -1,6 +1,8 @@
 package forms;
 
 import controller.IController;
+import listeners.CustomMouseListener;
+import listeners.CustomWindowListener;
 import model.IModel;
 import model.Task;
 import observer.ListObserver;
@@ -12,82 +14,91 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**
- * Графический интерфейс для отображения, добавления и удаления задач.
- * Экземпляр этого класса отображается при запуске приложения.
+ * GUI to display list of the tasks.
  */
-public class StartForm extends JFrame implements ActionListener, MouseListener, WindowListener, ListObserver {
+public class StartForm extends JFrame implements ActionListener, CustomMouseListener, CustomWindowListener, ListObserver {
     /**
-     * Отображает список задач.
-     * По умолчанию, отображает список текущих задач.
+     * Displays list of the tasks.
+     * By default list of the current tasks.
      */
     private JList taskList;
     /**
-     * Кнопка для вызова окна добавления задачи.
+     * Button to open the window to add a new task.
      */
     private JButton addButton;
     /**
-     * Компонент для удаления выбранной задачи.
+     * Button for deleting the selected task..
      */
     private JButton deleteButton;
     /**
-     * Компонент для указания, какой список задач будет отображаться.
-     * Если значение свойства isSelected равно true, то отображается список текущих задач.
-     * По умолчанию, значения свойства isSelected равно true.
+     * Component to specify a list of tasks to be displayed.
+     * If the value of property isSelected is true, then the current tasks will be displayed.
+     * The value of property isSelected is true by default;
      */
     private JRadioButton current_rb;
     /**
-     * Если значение свойства isSelected равно true, то отображается список завершенных задач.
+     * Component to specify a list of tasks to be displayed.
+     * If the value of property isSelected is true, then the completed tasks will be displayed.
      */
     private JRadioButton completed_rb;
     /**
-     * Контейнер для компонентов формы.
+     * Container for components of this form.
      */
     private JPanel mainPanel;
     /**
-     * Управляет формой.
+     * Controls this form.
      */
     IController c ;
     /**
-     * Предоставляет данные для отображения.
+     * Provides the data for displaying.
      */
     IModel m;
     /**
-     * Системный трей.
+     * System tray.
      */
     private SystemTray tray;
     /**
-     * Иконка, которая будет отображаться в системной трее.
+     * Icon that will be displayed in system tray.
      */
     private TrayIcon trayIcon;
+
+    private final String ADD_ACTION = "add data";
+
+    private final String DELETE_ACTION = "delete data";
+
+    private final String OPEN_ACTION = "open";
+
+    private final String EXIT_ACTION = "exit";
+
+    private final String DISPLAY_CURRENT_ACTION = "display current";
+
+    private final String DISPLAY_COMPLETED_ACTION = "display completed";
     /**
-     * Элемент меню для открытия формы.
+     * Array in which index this is number of the task in JList
+     * and pairs[index] this is identifier of the task.
      */
-    private MenuItem openItem;
+    private AtomicIntegerArray pairs;
     /**
-     * Элемент меню для закрытия приложения.
+     * Creates and displays form.
+     * @param c controller
+     * @param m model
+     * @throws HeadlessException thrown when code that is dependent on a keyboard, display, or mouse
+     * is called in an environment that does not support a keyboard, display,
+     * or mouse.
      */
-    private MenuItem exitItem;
-    /**
-     * Создает и отображает форму.
-     * Инициализирует поля IController и IModel.
-     * @param c контроллер
-     * @param m модель
-     * @throws HeadlessException будет брошено, когда код, который зависит от клавиатуры, дисплея или мыши
-     * вызывается в среде, которая не поддерживает клавиатуру, дисплей или мышь.
-     * @throws IOException будет брошено, если произошла ошибка ввода/вывода.
-     */
-    public StartForm(IController c, IModel m) throws HeadlessException, IOException {
+    public StartForm(IController c, IModel m) throws HeadlessException {
 
         setContentPane(mainPanel);
         setTitle("Task manager");
-        addButton.addActionListener(this);
-        deleteButton.addActionListener(this);
+        configButton(addButton, ADD_ACTION);
+        configButton(deleteButton, DELETE_ACTION);
         taskList.addMouseListener(this);
-        current_rb.addActionListener(this);
-        completed_rb.addActionListener(this);
+        configButton(current_rb, DISPLAY_CURRENT_ACTION);
+        configButton(completed_rb, DISPLAY_COMPLETED_ACTION);
 
         this.c = c;
         this.m = m;
@@ -95,17 +106,7 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
 
         if(SystemTray.isSupported())
         {
-            tray = SystemTray.getSystemTray();
-            Image img = ImageIO.read(new File("images/bulb.gif"));
-            PopupMenu popupMenu = new PopupMenu();
-            exitItem = new MenuItem("Exit");
-            openItem = new MenuItem("Open");
-            popupMenu.add(openItem);
-            popupMenu.add(exitItem);
-            exitItem.addActionListener(this);
-            openItem.addActionListener(this);
-            trayIcon = new TrayIcon(img, "Task manager",popupMenu);
-            trayIcon.setImageAutoSize(true);
+            configTray();
         }
         addWindowListener(this);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -113,192 +114,121 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         pack();
     }
 
-    /**
-     * Вызывается, когда произошло действие.
-     * Например, была нажата кнопка Добавить, Удалить и т.д.
-     * @param e событие.
-     */
+    private void configButton(AbstractButton button, String action) {
+        button.setActionCommand(action);
+        button.addActionListener(this);
+    }
+
+    private void configTray() {
+        tray = SystemTray.getSystemTray();
+        Image img = null;
+        try {
+            img = ImageIO.read(new File("images/bulb.gif"));
+        } catch (IOException e) {
+            //TODO: draw default img
+        }
+        PopupMenu popupMenu = new PopupMenu();
+        MenuItem exitItem = new MenuItem("Exit");
+        MenuItem openItem = new MenuItem("Open");
+        popupMenu.add(openItem);
+        popupMenu.add(exitItem);
+        exitItem.setActionCommand(EXIT_ACTION);
+        exitItem.addActionListener(this);
+        openItem.setActionCommand(OPEN_ACTION);
+        openItem.addActionListener(this);
+        trayIcon = new TrayIcon(img, "Task manager",popupMenu);
+        trayIcon.setImageAutoSize(true);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == current_rb)
-        {
-            addButton.setEnabled(true);
-            Main.CURRENT = Main.NOTCOMPLETED;
-            try {
-                c.load();
-            } catch (IOException e1) {
 
-            }
-        }
-        else if (e.getSource() == completed_rb)
+        switch (e.getActionCommand())
         {
-            addButton.setEnabled(false);
-            Main.CURRENT = Main.COMPLETED;
-            try {
-                c.load();
-            } catch (IOException e1) {
-
-            }
-        }
-        else if(e.getSource() == addButton)
-        {
-            new CreateTaskDialog(c).setVisible(true);
-        }
-        else if(e.getSource() == deleteButton)
-        {
-            int index = taskList.getSelectedIndex();
-            if(index != -1)
-            {
-                int option = JOptionPane.showConfirmDialog(getContentPane(),"Are you sure?", " Delete", JOptionPane.YES_NO_OPTION);
-                if(option == JOptionPane.YES_OPTION) {
-                    c.delete(index);
-                }
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
-            }
-        }
-        else if(e.getSource() == openItem)
-        {
-            setVisible(true);
-            tray.remove(trayIcon);
-        }
-        else if(e.getSource() == exitItem)
-        {
-            System.exit(0);
+            case ADD_ACTION:
+                new CreateTaskDialog(c).setVisible(true);
+                break;
+            case DELETE_ACTION:
+                deleteAction();
+                break;
+            case DISPLAY_COMPLETED_ACTION:
+                changeState(false, Main.COMPLETED);
+                break;
+            case DISPLAY_CURRENT_ACTION:
+                changeState(true, Main.NOTCOMPLETED);
+                break;
+            case OPEN_ACTION:
+                removeFromSystemTray();
+                break;
+            case EXIT_ACTION:
+                System.exit(0);
+                break;
+            default:
+                break;
         }
     }
 
-    /**
-     * Вызывается, когда кнопка мыши была нажата (нажата и отпущена) на компоненте.
-     * @param e событие мыши.
-     */
+    private void removeFromSystemTray() {
+        setVisible(true);
+        tray.remove(trayIcon);
+    }
+
+    private void deleteAction() {
+        int index = taskList.getSelectedIndex();
+        if(index != -1)
+        {
+            int option = JOptionPane.showConfirmDialog(getContentPane(), "Are you sure?", " Delete", JOptionPane.YES_NO_OPTION);
+            if(option == JOptionPane.YES_OPTION) {
+                c.delete(pairs.get(index));
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
+        }
+    }
+
+    private void changeState(boolean isEnabled, int newState) {
+        addButton.setEnabled(isEnabled);
+        Main.CURRENT = newState;
+        c.load();
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getSource() == taskList && e.getClickCount() == 2)
         {
             int index = taskList.getSelectedIndex();
-            ShowTaskDialog dialog = new ShowTaskDialog(c, m);
-            c.show(index);
-            dialog.setEnabled(true);
+            new ShowTaskDialog(c, m, pairs.get(index));
         }
     }
-    /**
-     * Вызывается, когда кнопка мыши была нажата на компоненте.
-     * @param e событие.
-     */
-    @Override
-    public void mousePressed(MouseEvent e) {
 
-    }
-    /**
-     * Вызывается, когда кнопка мыши была отпущена на компоненте.
-     * @param e событие.
-     */
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-    /**
-     * Вызывается, когда курсор мыши был наведен на компонент.
-     * @param e событие
-     */
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-    /**
-     * Вызывается, когда курсор мыши был убран с компонента.
-     * @param e событие
-     */
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-    /**
-     * Обновляет список задач на форме.
-     * Вызывается, когда произошли какие-либо изменения, например, добавление задачи.
-     */
     @Override
     public void update() {
         if(m != null)
         {
-            ArrayList<String> tasks = m.getData();
+            Vector<Task> tasks = m.getData();
+
             if(tasks != null) {
+                pairs = new AtomicIntegerArray(tasks.size());
                 DefaultListModel listModel = new DefaultListModel();
-                for (String s : tasks) {
-                    listModel.addElement(s);
-                }
+                final int[] index = {0};
+                tasks.stream().forEach((task -> {
+                    listModel.addElement(task.getName());
+                    pairs.set(index[0], task.getID());
+                    index[0]++;
+                }));
+
+               /* for (int i = 0; i < pairs.length; i++) {
+                    Task current = tasks.get(i);
+                    listModel.addElement(current.getName()/* + " : " + current.getID());
+                    pairs[i] = current.getID();
+                }*/
                 taskList.setModel(listModel);
             }
         }
     }
 
-    /**
-     * Отображает диалоговое окно о выполнении задачи.
-     * Предоставляет возможность завершить или отложить задачу.
-     * @param task задача, которая произошла.
-     */
-    @Override
-    public void update(Task task) {
-        if(m != null)
-        {
-            String message = "Name: " + task.getName() + "\n" +
-                    "Description : " + task.getDescription() +
-                    "\n" + "Contacts :" + task.getContacts();
-            String[] options = {"delay", "complete"};
-
-            int answer = JOptionPane.showOptionDialog(new JFrame(), message,
-                    "Notification",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[1]);
-            if(answer == JOptionPane.YES_OPTION)
-            {
-                c.delay(task);
-            }
-            else {
-                c.complete(task);
-            }
-        }
-    }
-
-    /**
-     * Вызывается, когда окно видимо.
-     * @param e
-     */
-    @Override
-    public void windowOpened(WindowEvent e) {
-
-    }
-    /**
-     * Вызывается при закрытии окна.
-     * @param e событие
-     */
-    @Override
-    public void windowClosing(WindowEvent e) {
-       /* try {
-            tray.add(trayIcon);
-        } catch (AWTException e1) {
-
-        }
-        setVisible(false);*/
-    }
-    /**
-     * Вызывается, когда окно закрыто.
-     * @param e событие
-     */
-    @Override
-    public void windowClosed(WindowEvent e) {
-
-    }
-    /**
-     * Вызывается при сворачивании окна.
-     * @param e событие
-     */
     @Override
     public void windowIconified(WindowEvent e) {
         try {
@@ -308,28 +238,5 @@ public class StartForm extends JFrame implements ActionListener, MouseListener, 
         }
         setVisible(false);
     }
-    /**
-     * Вызывается при возвращении окна из свернутого состояния в нормальное.
-     * @param e событие
-     */
-    @Override
-    public void windowDeiconified(WindowEvent e) {
 
-    }
-    /**
-     * Вызывается, когда окно активно.
-     * @param e
-     */
-    @Override
-    public void windowActivated(WindowEvent e) {
-
-    }
-    /**
-     * Вызывается, когда окно не активно.
-     * @param e
-     */
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-
-    }
 }

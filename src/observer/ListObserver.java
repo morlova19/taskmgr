@@ -1,22 +1,13 @@
 package observer;
-
-import model.Task;
 /**
- * Интерфейс наблюдателя.
- * Оповещение наблюдателю приходит от наблюдаемого объекта
- * в случаем, если со списком задач произошли изменения,
- * а также при наступлении задачи.
+ * Interface of observer.
+ * Notifications come to observer from observable object
+ * when some changes were done with the list of the tasks.
  */
 public interface ListObserver {
     /**
-     * Вызывается, когда нужно обновить на форме список задач.
+     * Invoked when changes occurred and
+     * need to update the list of tasks on the form.
      */
     void update();
-
-    /**
-     * Вызывается, когда пришло время выполнения задачи
-     * и нужно показать оповещение.
-     * @param task задача, которая произошла.
-     */
-    void update(Task task);
 }

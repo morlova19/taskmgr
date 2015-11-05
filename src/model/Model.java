@@ -1,120 +1,96 @@
 package model;
 
+import journalmgr.JournalManager;
 import observer.ListObserver;
-import observer.MessageObserver;
 import observer.TaskObserver;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.util.Date;
+import java.util.Vector;
 
 /**
  * Part of taskmgr.
  */
-public class Model implements IModel, MessageObserver {
+public class Model implements IModel {
 
     private Journal journal;
     private JournalManager manager;
-    private NotificationSystem nSystem;
     private ListObserver lObserver;
     private TaskObserver tObserver;
 
-    public Model(JournalManager manager) throws IOException {
+    public Model(JournalManager manager, Journal journal) {
         this.manager = manager;
-        journal = manager.readJournal();
-        journal.reload();
+        this.journal = journal;
         load();
-       // notifyListObserver();
-        nSystem = new NotificationSystem(journal);
-        nSystem.registerObserver(this);
     }
-
-    public void add(String name, String desc, Date date, String contacts) {
-        Task task = new Task(name, desc, date, contacts);
+    @Override
+    public void add(Task task) throws TransformerException, ParserConfigurationException {
         journal.addTask(task);
-        try {
-            manager.writeJournal(journal);
-        } catch (IOException e) {
-           // e.printStackTrace();
-        }
-        nSystem.startTask(task);
+        manager.writeJournal(journal);
         notifyListObserver();
     }
 
-    public void delete(int id) {
+    @Override
+    public void delete(int id) throws TransformerException, ParserConfigurationException {
         Task t = journal.getTask(id);
-        journal.deleteTask(t);
-        try {
+        if(t != null) {
+            journal.deleteTask(t);
             manager.writeJournal(journal);
-        } catch (IOException e) {
-
-        }
-        long delta = t.getDate().getTime() - Calendar.getInstance().getTimeInMillis();
-        if(delta > 0) {
-            nSystem.cancelTask(t);
         }
         notifyListObserver();
     }
 
-    public ArrayList<String> getData() {
-        return journal.getNames();
+    @Override
+    public Vector<Task> getData() {
+        return journal.getTasks();
     }
 
+    @Override
     public void registerListObserver(ListObserver o) {
         lObserver = o;
     }
 
+    @Override
     public void registerTaskObserver(TaskObserver o) {
         tObserver = o;
     }
 
+    @Override
     public Task get(int id) {
         return journal.getTask(id);
     }
 
+    @Override
     public void show(int id) {
         notifyTaskObserver(id);
     }
-    public void load() throws IOException {
+
+    @Override
+    public void load() {
         notifyListObserver();
     }
-    @Override
-    public void delay(Task t) {
-        journal.delayTask(t);
-        try {
-            manager.writeJournal(journal);
-        } catch (IOException e) {
 
-        }
-        nSystem.delayTask(t);
-    }
     @Override
-    public void complete(Task t)
-    {
+    public void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException {
+        journal.delayTask(id, newDate);
+        manager.writeJournal(journal);
+    }
+
+    @Override
+    public void complete(Task t) throws TransformerException, ParserConfigurationException {
         journal.setCompleted(t);
-        try {
-            manager.writeJournal(journal);
-        } catch (IOException e) {
-
-        }
+        manager.writeJournal(journal);
         notifyListObserver();
     }
+
     private void notifyListObserver() {
         if (lObserver != null) lObserver.update();
-    }
-
-    private void notifyListObserver(Task task) {
-        if (lObserver != null) lObserver.update(task);
     }
 
     private void notifyTaskObserver(int id) {
         if (tObserver != null) tObserver.update(id);
     }
 
-    public void update(Task task) {
-
-        notifyListObserver(task);
-    }
 
 }
