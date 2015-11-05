@@ -12,34 +12,32 @@ import java.util.Date;
  */
 public interface IController {
     /**
-     * invoked when a button to add was pressed.
-     *
-     * Принимает введенные пользователем параметры новой задачи.
+     * Invokes when a button to add was pressed.
+     *@param data object that contains parameters of new data.
      */
     void add(TransferObject data);
     /**
-     * Вызывается, если на форме была нажата кнопка удалить.
-     * Принимает номер выбранное задачи в списке задач.
-     * @param id номер задачи.
+     * Invokes when a button to delete was pressed.
+     * @param id identifier of the task.
      */
     void delete(int id);
     /**
-     * Вызывается, когда необходимо загрузить список задач в форму.
+     * Invokes to display the list of the tasks.
      */
     void load();
     /**
-     * Вызывается, когда нужно отображить информацию о задаче.
-     * @param id номер задачи в списке задач.
+     * Invokes to display the details of the task.
+     * @param id identifier of the task.
      */
     void show(int id);
     /**
-     * Вызывается, когда нужно отложить задачу.
-     * @param t задача, которую нужно отложить.
+     * Invokes to delay the task.
+     * @param id identifier of the task that will be delayed.
      */
-    void delay(Task t, Date newDate);
+    void delay(int id, Date newDate);
     /**
-     * Вызывается, когда нужно завершить задачу.
-     * @param t задача, которую нужно завершить.
+     * Invokes to complete the task.
+     * @param t identifier of the task that will be completed.
      */
     void complete(Task t);
 }

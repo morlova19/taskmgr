@@ -29,7 +29,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="e7465" class="javax.swing.JButton" binding="buttonDelay">
+              <component id="e7465" class="javax.swing.JButton" binding="delayButton">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -37,7 +37,7 @@
                   <text value="delay"/>
                 </properties>
               </component>
-              <component id="5723f" class="javax.swing.JButton" binding="buttonComplete">
+              <component id="5723f" class="javax.swing.JButton" binding="completeButton">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -57,11 +57,13 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="2d84c" class="javax.swing.JLabel" binding="message">
+          <component id="2d84c" class="javax.swing.JTextArea" binding="message">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <editable value="false"/>
+              <enabled value="true"/>
               <text value=""/>
             </properties>
           </component>

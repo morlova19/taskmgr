@@ -22,17 +22,17 @@ public class MessageDialog extends JDialog implements TaskObserver {
      * Button to delay the task.
      * @see JButton
      */
-    private JButton buttonDelay;
+    private JButton delayButton;
     /**
      * Button to complete the task.
      * @see JButton
      */
-    private JButton buttonComplete;
+    private JButton completeButton;
     /**
      * Component for displaying the details of the task.
      * @see JLabel
      */
-    private JLabel message;
+    private JTextArea message;
     /**
      * Component for selecting new date of the task.
      * @see JSpinner
@@ -70,7 +70,7 @@ public class MessageDialog extends JDialog implements TaskObserver {
     public void update(int id) {
         Task t = model.get(id);
         message.setText(t.toString());
-        buttonDelay.addActionListener(e -> {
+        delayButton.addActionListener(e -> {
 
             long delta = ((Date) dateSpinner.getValue()).getTime() - Calendar.getInstance().getTimeInMillis();
             if(delta <= 0)
@@ -78,17 +78,21 @@ public class MessageDialog extends JDialog implements TaskObserver {
                 JOptionPane.showMessageDialog(new JFrame(),"Please enter correct new date");
             }
             else {
-                controller.delay(t,(Date)dateSpinner.getValue());
+                controller.delay(id,(Date)dateSpinner.getValue());
                 dispose();
             }
         });
 
-        buttonComplete.addActionListener(e -> {
+        completeButton.addActionListener(e -> {
             controller.complete(t);
             dispose();
         });
+        setResizable(false);
         pack();
         setVisible(true);
     }
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }

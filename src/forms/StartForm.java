@@ -15,6 +15,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**
  * GUI to display list of the tasks.
@@ -64,20 +65,23 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
      * Icon that will be displayed in system tray.
      */
     private TrayIcon trayIcon;
-    /**
-     * Menu item to open form.
-     */
-    private MenuItem openItem;
-    /**
-     * Menu item to exit app.
-     */
-    private MenuItem exitItem;
 
+    private final String ADD_ACTION = "add data";
+
+    private final String DELETE_ACTION = "delete data";
+
+    private final String OPEN_ACTION = "open";
+
+    private final String EXIT_ACTION = "exit";
+
+    private final String DISPLAY_CURRENT_ACTION = "display current";
+
+    private final String DISPLAY_COMPLETED_ACTION = "display completed";
     /**
      * Array in which index this is number of the task in JList
      * and pairs[index] this is identifier of the task.
      */
-    private int[] pairs;
+    private AtomicIntegerArray pairs;
     /**
      * Creates and displays form.
      * @param c controller
@@ -90,11 +94,11 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
         setContentPane(mainPanel);
         setTitle("Task manager");
-        addButton.addActionListener(this);
-        deleteButton.addActionListener(this);
+        configButton(addButton, ADD_ACTION);
+        configButton(deleteButton, DELETE_ACTION);
         taskList.addMouseListener(this);
-        current_rb.addActionListener(this);
-        completed_rb.addActionListener(this);
+        configButton(current_rb, DISPLAY_CURRENT_ACTION);
+        configButton(completed_rb, DISPLAY_COMPLETED_ACTION);
 
         this.c = c;
         this.m = m;
@@ -102,22 +106,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
         if(SystemTray.isSupported())
         {
-            tray = SystemTray.getSystemTray();
-            Image img = null;
-            try {
-                img = ImageIO.read(new File("images/bulb.gif"));
-            } catch (IOException e) {
-                //draw default img
-            }
-            PopupMenu popupMenu = new PopupMenu();
-            exitItem = new MenuItem("Exit");
-            openItem = new MenuItem("Open");
-            popupMenu.add(openItem);
-            popupMenu.add(exitItem);
-            exitItem.addActionListener(this);
-            openItem.addActionListener(this);
-            trayIcon = new TrayIcon(img, "Task manager",popupMenu);
-            trayIcon.setImageAutoSize(true);
+            configTray();
         }
         addWindowListener(this);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -125,45 +114,77 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         pack();
     }
 
+    private void configButton(AbstractButton button, String action) {
+        button.setActionCommand(action);
+        button.addActionListener(this);
+    }
+
+    private void configTray() {
+        tray = SystemTray.getSystemTray();
+        Image img = null;
+        try {
+            img = ImageIO.read(new File("images/bulb.gif"));
+        } catch (IOException e) {
+            //TODO: draw default img
+        }
+        PopupMenu popupMenu = new PopupMenu();
+        MenuItem exitItem = new MenuItem("Exit");
+        MenuItem openItem = new MenuItem("Open");
+        popupMenu.add(openItem);
+        popupMenu.add(exitItem);
+        exitItem.setActionCommand(EXIT_ACTION);
+        exitItem.addActionListener(this);
+        openItem.setActionCommand(OPEN_ACTION);
+        openItem.addActionListener(this);
+        trayIcon = new TrayIcon(img, "Task manager",popupMenu);
+        trayIcon.setImageAutoSize(true);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if(e.getSource() == current_rb)
+        switch (e.getActionCommand())
         {
-            changeState(true, Main.NOTCOMPLETED);
+            case ADD_ACTION:
+                new CreateTaskDialog(c).setVisible(true);
+                break;
+            case DELETE_ACTION:
+                deleteAction();
+                break;
+            case DISPLAY_COMPLETED_ACTION:
+                changeState(false, Main.COMPLETED);
+                break;
+            case DISPLAY_CURRENT_ACTION:
+                changeState(true, Main.NOTCOMPLETED);
+                break;
+            case OPEN_ACTION:
+                removeFromSystemTray();
+                break;
+            case EXIT_ACTION:
+                System.exit(0);
+                break;
+            default:
+                break;
+        }
+    }
 
-        }
-        else if (e.getSource() == completed_rb)
+    private void removeFromSystemTray() {
+        setVisible(true);
+        tray.remove(trayIcon);
+    }
+
+    private void deleteAction() {
+        int index = taskList.getSelectedIndex();
+        if(index != -1)
         {
-            changeState(false, Main.COMPLETED);
-        }
-        else if(e.getSource() == addButton)
-        {
-            new CreateTaskDialog(c).setVisible(true);
-        }
-        else if(e.getSource() == deleteButton)
-        {
-            int index = taskList.getSelectedIndex();
-            if(index != -1)
-            {
-                int option = JOptionPane.showConfirmDialog(getContentPane(),"Are you sure?", " Delete", JOptionPane.YES_NO_OPTION);
-                if(option == JOptionPane.YES_OPTION) {
-                    c.delete(pairs[index]);
-                }
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
+            int option = JOptionPane.showConfirmDialog(getContentPane(), "Are you sure?", " Delete", JOptionPane.YES_NO_OPTION);
+            if(option == JOptionPane.YES_OPTION) {
+                c.delete(pairs.get(index));
             }
         }
-        else if(e.getSource() == openItem)
+        else
         {
-            setVisible(true);
-            tray.remove(trayIcon);
-        }
-        else if(e.getSource() == exitItem)
-        {
-            System.exit(0);
+            JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
         }
     }
 
@@ -178,7 +199,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         if(e.getSource() == taskList && e.getClickCount() == 2)
         {
             int index = taskList.getSelectedIndex();
-            new ShowTaskDialog(c, m, pairs[index]);
+            new ShowTaskDialog(c, m, pairs.get(index));
         }
     }
 
@@ -187,15 +208,22 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         if(m != null)
         {
             Vector<Task> tasks = m.getData();
-            if(tasks != null) {
-                pairs = new int[tasks.size()];
-                DefaultListModel listModel = new DefaultListModel();
-                for (int i = 0; i < pairs.length; i++) {
 
+            if(tasks != null) {
+                pairs = new AtomicIntegerArray(tasks.size());
+                DefaultListModel listModel = new DefaultListModel();
+                final int[] index = {0};
+                tasks.stream().forEach((task -> {
+                    listModel.addElement(task.getName());
+                    pairs.set(index[0], task.getID());
+                    index[0]++;
+                }));
+
+               /* for (int i = 0; i < pairs.length; i++) {
                     Task current = tasks.get(i);
-                    listModel.addElement(current.getName()/* + " : " + current.getID()*/);
+                    listModel.addElement(current.getName()/* + " : " + current.getID());
                     pairs[i] = current.getID();
-                }
+                }*/
                 taskList.setModel(listModel);
             }
         }

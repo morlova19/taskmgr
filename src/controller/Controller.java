@@ -9,6 +9,9 @@ import observer.TaskObserver;
 import start.Main;
 import to.TransferObject;
 
+import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -48,18 +51,32 @@ public class Controller implements IController, TaskObserver {
     @Override
     public void add(TransferObject data) {
         Task t = new Task(data);
-        model.add(t);
-        nSystem.startTask(t.getID());
+        try {
+            model.add(t);
+        } catch (TransformerException | ParserConfigurationException e) {
+            displayErrorMessage();
+        }
+        finally {
+            nSystem.startTask(t.getID());
+        }
     }
 
     @Override
     public void delete(int id)
     {
         //Task t = model.get(id);
-        model.delete(id);
-        if(Main.CURRENT == Main.NOTCOMPLETED) {
-            nSystem.cancelTask(id);
+        try {
+            model.delete(id);
+
+        } catch (TransformerException | ParserConfigurationException e) {
+            displayErrorMessage();
         }
+        finally {
+            if(Main.CURRENT == Main.NOTCOMPLETED) {
+                nSystem.cancelTask(id);
+            }
+        }
+
 
     }
 
@@ -72,19 +89,35 @@ public class Controller implements IController, TaskObserver {
        model.show(id);
     }
     @Override
-    public void delay(Task t, Date newDate) {
-        model.delay(t,newDate);
-        nSystem.delayTask(t.getID());
+    public void delay(int id, Date newDate) {
+        Task t = model.get(id);
+        try {
+            model.delay(id, newDate);
+        } catch (TransformerException | ParserConfigurationException e) {
+            displayErrorMessage();
+        }
+        finally {
+            nSystem.delayTask(t.getID());
+        }
     }
     @Override
     public void complete(Task t)
     {
-        model.complete(t);
+        try {
+            model.complete(t);
+        } catch (TransformerException | ParserConfigurationException e) {
+            displayErrorMessage();
+        }
     }
 
     @Override
     public void update(int id) {
         mObserver = new MessageDialog(this,model);
         mObserver.update(id);
+    }
+
+    private void displayErrorMessage()
+    {
+        JOptionPane.showMessageDialog(new JFrame(), "cannot write into the file");
     }
 }

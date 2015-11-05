@@ -16,7 +16,6 @@
     <file url="file://$PROJECT_DIR$/src/model/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/ns/NotificationSystem.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/ListObserver.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/observer/MessageObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/TaskObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/start/Main.java" charset="UTF-8" />
   </component>

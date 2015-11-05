@@ -3,7 +3,7 @@ package listeners;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-public interface CustomWindowListener extends WindowListener{
+public interface CustomWindowListener extends WindowListener {
     default void windowOpened(WindowEvent e) {}
 
     default void windowClosing(WindowEvent e) {}

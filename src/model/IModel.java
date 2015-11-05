@@ -4,6 +4,8 @@ import observer.ListObserver;
 import observer.TaskObserver;
 import to.TransferObject;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
@@ -17,15 +19,15 @@ public interface IModel {
      * Adding data.
      * @param task data for adding.
      */
-    void add(Task task);
+    void add(Task task) throws TransformerException, ParserConfigurationException;
     /**
      * Deleting data.
      * @param id id of task.
      */
-    void delete(int id);
+    void delete(int id) throws TransformerException, ParserConfigurationException;
     /**
-     * Gets list of data
-     * @return list of strings.
+     * Gets list of data.
+     * @return list of data..
      */
     Vector<Task> getData();
     /**
@@ -42,6 +44,7 @@ public interface IModel {
     void registerTaskObserver(TaskObserver o);
     /**
      * Gets the task by identifier.
+     * Returns null if the task was not found.
      * @param id identifier of the task.
      * @return task that was found.
      */
@@ -57,13 +60,13 @@ public interface IModel {
     void load();
     /**
      * Invokes for delaying the task.
-     * @param t task that will be delayed.
+     * @param id identifier of the task that will be delayed.
      * @param newDate new date of execution of the task.
      */
-    void delay(Task t, Date newDate);
+    void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException;
     /**
      * Invokes to complete the task.
-     * @param t task that will be complered.
+     * @param t task that will be completed.
      */
-    void complete(Task t);
+    void complete(Task t) throws TransformerException, ParserConfigurationException;
 }

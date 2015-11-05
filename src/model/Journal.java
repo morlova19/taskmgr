@@ -16,13 +16,8 @@ public class Journal implements Serializable {
     Можно будет куда-то в другое место его убрать отсюда,
     но я пока не знаю куда лучше. Можно, например, будет сдать класс GeneratorID */
     private static int generatedID;
-
     public static int getGeneratedID() {
         return generatedID++;
-    }
-    public static int getLastGeneratedID()
-    {
-        return generatedID;
     }
     public static void setGeneratedID(int generatedID) {
         Journal.generatedID = generatedID;
@@ -32,35 +27,22 @@ public class Journal implements Serializable {
 
         if (Main.CURRENT == Main.COMPLETED)
         {
-            for(Task t : completedTasks)
-            {
-                if(t.getID() == index)
-                {
-                    return t;
-                }
-            }
+            return completedTasks.stream()
+                    .filter(task -> task.getID() == index)
+                    .findFirst().get();
         }
-          //  return completedTasks.elementAt(index);
         else
         {
-            for(Task t : currentTasks)
-            {
-                if(t.getID() == index)
-                {
-                    return t;
-                }
-            }
-           // return currentTasks.elementAt(index);
+            return currentTasks.stream()
+                    .filter(task -> task.getID() == index)
+                    .findFirst().get();
         }
-        return null;
-        //return new Task(currentTasks.elementAt(index));
     }
 
     void addTask(Task newTask) {
-        //if (Main.CURRENT == Main.COMPLETED) completedTasks.add(newTask);
-        //else
+        if(currentTasks != null) {
             currentTasks.add(newTask);
-        //currentTasks.add(new Task(newTask)); // возможно, лишнее копирование
+        }
     }
 
     void deleteTask(Task task) {
@@ -68,8 +50,12 @@ public class Journal implements Serializable {
         else currentTasks.remove(task);
     }
 
-    void delayTask(Task task, Date newDate) {// откладывает задачу на одну минуту
-        task.setDate(newDate);
+    void delayTask(int id, Date newDate) {// откладывает задачу на одну минуту
+        Task t = currentTasks
+                .stream()
+                .filter(task -> task.getID() == id)
+                .findFirst().get();
+        t.setDate(newDate);
     }
 
     void setCompleted(Task task) {

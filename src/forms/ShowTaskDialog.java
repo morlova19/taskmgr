@@ -43,7 +43,6 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
      * Field to display contacts.
      */
     private JTextArea contacts_tf;
-
     /**
      * Controls this dialog.
      */
@@ -52,6 +51,10 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
      * Provides task's details to display.
      */
     IModel m;
+
+    private final String OK_ACTION = "OK";
+    private final String CANCEL_ACTION = "Cancel";
+
     /**
      * Creates and displays dialog.
      * @param c controller.
@@ -64,7 +67,9 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
         setContentPane(contentPane);
         date_spinner.setModel(new SpinnerDateModel());
         buttonOK.addActionListener(this);
+        buttonOK.setActionCommand(OK_ACTION);
         buttonCancel.addActionListener(this);
+        buttonCancel.setActionCommand(CANCEL_ACTION);
         c.show(id);
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -72,16 +77,17 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == buttonOK)
+
+        switch (e.getActionCommand())
         {
-            dispose();
-        }
-        else if(e.getSource() == buttonCancel)
-        {
-            dispose();
+            case OK_ACTION:
+                dispose();
+                break;
+            case CANCEL_ACTION:
+                dispose();
+                break;
         }
     }
-
     /**
      * Gets task's details and fills fields of this form.
      * @param id id of the task whose details will be displayed.
@@ -89,8 +95,7 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
     @Override
     public void update(int id) {
         Task t = m.get(id);
-        if(t != null)
-        {
+        if(t != null) {
             name_tf.setText(t.getName());
             description_tf.setText(t.getDescription());
             date_spinner.setValue(t.getDate());

@@ -48,6 +48,9 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
      */
     private IController controller;
 
+    private final String OK_ACTION = "OK";
+    private final String CANCEL_ACTION = "Cancel";
+
     /**
      * Constructs and displays dialog window.
      * @param controller controller that controls this form.
@@ -57,7 +60,9 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
         setContentPane(contentPane);
         setTitle("New task");
         buttonOK.addActionListener(this);
+        buttonOK.setActionCommand(OK_ACTION);
         buttonCancel.addActionListener(this);
+        buttonCancel.setActionCommand(CANCEL_ACTION);
         date_spinner.setModel(new SpinnerDateModel());
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -66,34 +71,40 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == buttonOK)
+
+        switch (e.getActionCommand())
         {
-            if(name_tf.getText().equals(""))
+            case OK_ACTION:
+                add();
+                break;
+            case CANCEL_ACTION:
+                dispose();
+                break;
+        }
+    }
+
+    private void add() {
+        if(name_tf.getText().equals(""))
+        {
+            JOptionPane.showMessageDialog(new JFrame(), "Please enter name of task");
+        }
+        else {
+            Date date = (Date) date_spinner.getValue();
+            if(date.getTime() - Calendar.getInstance().getTimeInMillis() < 0)
             {
-                JOptionPane.showMessageDialog(new JFrame(),"Please enter name of task");
+                JOptionPane.showMessageDialog(new JFrame(),"Please enter correct date of task");
             }
             else {
-                Date date = (Date) date_spinner.getValue();
-                if(date.getTime() - Calendar.getInstance().getTimeInMillis() < 0)
-                {
-                    JOptionPane.showMessageDialog(new JFrame(),"Please enter correct date of task");
-                }
-                else {
-                    TransferObject to = new TransferObject();
-                    to.setName(name_tf.getText());
-                    to.setDescription(description_tf.getText());
-                    to.setDate(date);
-                    to.setContacts(contacts_tf.getText());
-                    to.setId(Journal.getGeneratedID());
-                    controller.add(to);
-                    dispose();
-                }
-
+                TransferObject to = new TransferObject();
+                to.setName(name_tf.getText());
+                to.setDescription(description_tf.getText());
+                to.setDate(date);
+                to.setContacts(contacts_tf.getText());
+                to.setId(Journal.getGeneratedID());
+                controller.add(to);
+                dispose();
             }
-        }
-        else if(e.getSource() == buttonCancel)
-        {
-            dispose();
+
         }
     }
 }

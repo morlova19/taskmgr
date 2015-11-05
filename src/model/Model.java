@@ -4,6 +4,8 @@ import journalmgr.JournalManager;
 import observer.ListObserver;
 import observer.TaskObserver;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -22,14 +24,15 @@ public class Model implements IModel {
         this.journal = journal;
         load();
     }
-
-    public void add(Task task) {
+    @Override
+    public void add(Task task) throws TransformerException, ParserConfigurationException {
         journal.addTask(task);
         manager.writeJournal(journal);
         notifyListObserver();
     }
 
-    public void delete(int id) {
+    @Override
+    public void delete(int id) throws TransformerException, ParserConfigurationException {
         Task t = journal.getTask(id);
         if(t != null) {
             journal.deleteTask(t);
@@ -38,40 +41,49 @@ public class Model implements IModel {
         notifyListObserver();
     }
 
+    @Override
     public Vector<Task> getData() {
         return journal.getTasks();
     }
 
+    @Override
     public void registerListObserver(ListObserver o) {
         lObserver = o;
     }
 
+    @Override
     public void registerTaskObserver(TaskObserver o) {
         tObserver = o;
     }
 
+    @Override
     public Task get(int id) {
         return journal.getTask(id);
     }
 
+    @Override
     public void show(int id) {
         notifyTaskObserver(id);
     }
+
+    @Override
     public void load() {
         notifyListObserver();
     }
+
     @Override
-    public void delay(Task t, Date newDate) {
-        journal.delayTask(t, newDate);
+    public void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException {
+        journal.delayTask(id, newDate);
         manager.writeJournal(journal);
     }
+
     @Override
-    public void complete(Task t)
-    {
+    public void complete(Task t) throws TransformerException, ParserConfigurationException {
         journal.setCompleted(t);
         manager.writeJournal(journal);
         notifyListObserver();
     }
+
     private void notifyListObserver() {
         if (lObserver != null) lObserver.update();
     }
