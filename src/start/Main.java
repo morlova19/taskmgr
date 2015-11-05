@@ -21,6 +21,8 @@ public class Main {
         IModel model = new Model(manager,journal);
         IController controller = new Controller(model, nSystem);
 
+
+
     }
 
 }
