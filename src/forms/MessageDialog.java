@@ -91,8 +91,4 @@ public class MessageDialog extends JDialog implements TaskObserver {
         pack();
         setVisible(true);
     }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
 }

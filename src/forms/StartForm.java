@@ -218,7 +218,6 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
                     pairs.set(index[0], task.getID());
                     index[0]++;
                 }));
-
                /* for (int i = 0; i < pairs.length; i++) {
                     Task current = tasks.get(i);
                     listModel.addElement(current.getName()/* + " : " + current.getID());

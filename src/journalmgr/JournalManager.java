@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.file.InvalidPathException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -41,14 +42,20 @@ public class JournalManager {
     private String comp_filename;
 
     public JournalManager(String path) {
-        if(!new File(path).exists())
-        {
-            File dir = new File(path);
-            dir.mkdir();
+        //TODO: check if path is directory
+        if(new File(path).isDirectory()) {
+            if (!new File(path).exists()) {
+                File dir = new File(path);
+                dir.mkdir();
+            }
+            this.dir = path;
+            cur_filename = dir +"tasks_current.xml";
+            comp_filename = dir +"tasks_completed.xml";
         }
-        this.dir = path;
-        cur_filename = dir +"tasks_current.xml";
-        comp_filename = dir +"tasks_completed.xml";
+        else {
+            throw new InvalidPathException(path," Path is not directory");
+        }
+
     }
 
     public void writeJournal(Journal journal) throws TransformerException, ParserConfigurationException {
@@ -65,22 +72,21 @@ public class JournalManager {
             journal.setCurrentTasks(cur_tasks);
             Vector<Task> completed_tasks = read(new File(comp_filename));
             journal.setCompletedTasks(completed_tasks);
-            if((!completed_tasks.isEmpty()) || (!cur_tasks.isEmpty()))
+            int max1 = 0;
+            int max2 = 0;
+            if(!completed_tasks.isEmpty())
             {
-                int max1 = journal.getCompletedTasks()
+                max1 = journal.getCompletedTasks()
                         .stream()
                         .mapToInt(Task::getID)
                         .max().getAsInt();
-                int max2 = journal.getCurrentTasks()
+            }
+            if (!cur_tasks.isEmpty()) {
+                max2 = journal.getCurrentTasks()
                         .stream()
-                        .mapToInt(Task::getID)
-                        .max().getAsInt();
-                Journal.setGeneratedID(Math.max(max1,max2) + 1);
+                        .mapToInt(Task::getID).max().getAsInt();
             }
-            else if(completed_tasks.isEmpty() && cur_tasks.isEmpty())
-            {
-                Journal.setGeneratedID(1);
-            }
+            Journal.setGeneratedID(Math.max(max1,max2) + 1);
 
        // } catch (Exception e) {
 

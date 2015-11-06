@@ -10,8 +10,8 @@ import java.util.*;
  */
 public class Journal implements Serializable {
 
-    private Vector<Task> currentTasks;
-    private Vector<Task> completedTasks;
+    private Vector<Task> currentTasks = new Vector<>();
+    private Vector<Task> completedTasks = new Vector<>();
     /*уникальный id задачи, который будет генерироваться (инкрементироваться)
     Можно будет куда-то в другое место его убрать отсюда,
     но я пока не знаю куда лучше. Можно, например, будет сдать класс GeneratorID */
