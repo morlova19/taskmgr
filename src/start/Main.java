@@ -28,7 +28,6 @@ public class Main {
 
         try {
             ServerSocket socket = new ServerSocket(9999);
-
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(),"Task manager is already running ");
             System.exit(1);
