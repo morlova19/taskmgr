@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Part of taskmgr.
  */
-public class NotificationSystem {
+public class NotificationSystem { //test
     private class NotifyTask extends TimerTask {
         private TaskObserver observer;
         private int id;
