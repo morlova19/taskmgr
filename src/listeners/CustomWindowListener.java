@@ -3,6 +3,10 @@ package listeners;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+/**
+ * Interface of WindowListener that contains default methods.
+ * @see java.awt.event.WindowListener
+ */
 public interface CustomWindowListener extends WindowListener {
     default void windowOpened(WindowEvent e) {}
 

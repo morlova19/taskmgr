@@ -12,7 +12,6 @@ import to.TransferObject;
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.util.Calendar;
 import java.util.Date;
 
 public class Controller implements IController, TaskObserver {
@@ -44,7 +43,6 @@ public class Controller implements IController, TaskObserver {
             this.nSystem = nSystem;
             nSystem.registerObserver(this);
         }
-       // model.load();
         startForm.setVisible(true);
     }
 
@@ -64,7 +62,6 @@ public class Controller implements IController, TaskObserver {
     @Override
     public void delete(int id)
     {
-        //Task t = model.get(id);
         try {
             model.delete(id);
 
@@ -76,8 +73,6 @@ public class Controller implements IController, TaskObserver {
                 nSystem.cancelTask(id);
             }
         }
-
-
     }
 
     @Override
@@ -116,6 +111,9 @@ public class Controller implements IController, TaskObserver {
         mObserver.update(id);
     }
 
+    /**
+     * Displays error message.
+     */
     private void displayErrorMessage()
     {
         JOptionPane.showMessageDialog(new JFrame(), "cannot write into the file");

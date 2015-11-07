@@ -3,21 +3,21 @@ package controller;
 import model.Task;
 import to.TransferObject;
 
-import java.io.IOException;
 import java.util.Date;
 
 /**
  * Interface of controller.
- * Controller controls the work with form and model.
+ * Controller provides methods to work with data for view.
+ * It invokes methods of the Model and transfers the entered data to it.
  */
 public interface IController {
     /**
-     * Invokes when a button to add was pressed.
-     *@param data object that contains parameters of new data.
+     * Invokes when a button to add was clicked.
+     * @param data object that contains parameters of new data.
      */
     void add(TransferObject data);
     /**
-     * Invokes when a button to delete was pressed.
+     * Invokes when a button to delete was clicked.
      * @param id identifier of the task.
      */
     void delete(int id);

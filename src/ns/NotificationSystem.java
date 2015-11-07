@@ -29,11 +29,6 @@ public class NotificationSystem {
     public NotificationSystem(Journal journal) {
         map = new HashMap<>();
         this.journal = journal;
-       /* Iterator iterator = journal.getCurrentTasks().iterator();
-        while(iterator.hasNext())
-        {
-            startTask(((Task) iterator.next()).getID());
-        }*/
         journal.getCurrentTasks()
                 .parallelStream()
                 //.stream()

@@ -22,6 +22,22 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
  */
 public class StartForm extends JFrame implements ActionListener, CustomMouseListener, CustomWindowListener, ListObserver {
     /**
+     * Constant for question of confirmation deleting the data.
+     */
+    public static final String ARE_YOU_SURE = "Are you sure?";
+    /**
+     * Constant for message that will be displayed if the task was not selected.
+     */
+    public static final String PLEASE_SELECT_TASK = "Please, select task";
+    /**
+     * Constant for title of the message dialog.
+     */
+    public static final String DELETE = "Delete";
+    /**
+     * Constant for name of the app.
+     */
+    public static final String TASK_MANAGER = "Task manager";
+    /**
      * Displays list of the tasks.
      * By default list of the current tasks.
      */
@@ -60,26 +76,39 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
     /**
      * System tray.
      */
-    private SystemTray tray;
+    private SystemTray tray = null;
     /**
      * Icon that will be displayed in system tray.
      */
     private TrayIcon trayIcon;
 
+    /**
+     * Constant for actionCommand.
+     */
     private final String ADD_ACTION = "add data";
-
+    /**
+     * Constant for actionCommand.
+     */
     private final String DELETE_ACTION = "delete data";
-
+    /**
+     * Constant for actionCommand.
+     */
     private final String OPEN_ACTION = "open";
-
+    /**
+     * Constant for actionCommand.
+     */
     private final String EXIT_ACTION = "exit";
-
+    /**
+     * Constant for actionCommand.
+     */
     private final String DISPLAY_CURRENT_ACTION = "display current";
-
+    /**
+     * Constant for actionCommand.
+     */
     private final String DISPLAY_COMPLETED_ACTION = "display completed";
     /**
-     * Array in which index this is number of the task in JList
-     * and pairs[index] this is identifier of the task.
+     * Thread-safe array in which index this is number of the task in {@link #taskList}
+     * and pairs[index] this is identifier of this task.
      */
     private AtomicIntegerArray pairs;
     /**
@@ -93,16 +122,20 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
     public StartForm(IController c, IModel m) throws HeadlessException {
 
         setContentPane(mainPanel);
-        setTitle("Task manager");
+        setTitle(TASK_MANAGER);
         configButton(addButton, ADD_ACTION);
         configButton(deleteButton, DELETE_ACTION);
         taskList.addMouseListener(this);
         configButton(current_rb, DISPLAY_CURRENT_ACTION);
         configButton(completed_rb, DISPLAY_COMPLETED_ACTION);
 
-        this.c = c;
-        this.m = m;
-        m.registerListObserver(this);
+        if(c != null) {
+            this.c = c;
+        }
+        if(m != null) {
+            this.m = m;
+            m.registerListObserver(this);
+        }
 
         if(SystemTray.isSupported())
         {
@@ -136,7 +169,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         exitItem.addActionListener(this);
         openItem.setActionCommand(OPEN_ACTION);
         openItem.addActionListener(this);
-        trayIcon = new TrayIcon(img, "Task manager",popupMenu);
+        trayIcon = new TrayIcon(img, TASK_MANAGER,popupMenu);
         trayIcon.setImageAutoSize(true);
     }
 
@@ -177,21 +210,25 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         int index = taskList.getSelectedIndex();
         if(index != -1)
         {
-            int option = JOptionPane.showConfirmDialog(getContentPane(), "Are you sure?", " Delete", JOptionPane.YES_NO_OPTION);
+            int option = JOptionPane.showConfirmDialog(getContentPane(), ARE_YOU_SURE, DELETE, JOptionPane.YES_NO_OPTION);
             if(option == JOptionPane.YES_OPTION) {
-                c.delete(pairs.get(index));
+                if(c != null) {
+                    c.delete(pairs.get(index));
+                }
             }
         }
         else
         {
-            JOptionPane.showMessageDialog(getContentPane(),"Please, select task");
+            JOptionPane.showMessageDialog(getContentPane(), PLEASE_SELECT_TASK);
         }
     }
 
     private void changeState(boolean isEnabled, int newState) {
         addButton.setEnabled(isEnabled);
         Main.CURRENT = newState;
-        c.load();
+        if(c != null) {
+            c.load();
+        }
     }
 
     @Override
@@ -208,7 +245,6 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         if(m != null)
         {
             Vector<Task> tasks = m.getData();
-
             if(tasks != null) {
                 pairs = new AtomicIntegerArray(tasks.size());
                 DefaultListModel listModel = new DefaultListModel();
@@ -218,11 +254,6 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
                     pairs.set(index[0], task.getID());
                     index[0]++;
                 }));
-               /* for (int i = 0; i < pairs.length; i++) {
-                    Task current = tasks.get(i);
-                    listModel.addElement(current.getName()/* + " : " + current.getID());
-                    pairs[i] = current.getID();
-                }*/
                 taskList.setModel(listModel);
             }
         }
@@ -230,12 +261,14 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
     @Override
     public void windowIconified(WindowEvent e) {
-        try {
-            tray.add(trayIcon);
-        } catch (AWTException e1) {
-
+        if(tray != null) {
+            try {
+                tray.add(trayIcon);
+            } catch (AWTException e1) {
+                System.exit(1);
+            }
+            setVisible(false);
         }
-        setVisible(false);
     }
 
 }

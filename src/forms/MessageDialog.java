@@ -6,6 +6,8 @@ import model.Task;
 import observer.TaskObserver;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -14,38 +16,36 @@ import java.util.Date;
  */
 public class MessageDialog extends JDialog implements TaskObserver {
     /**
+     * Constant for error message that will be displayed if the entered date is not correct.
+     */
+    public static final String ENTER_DATE_MSG = "Please enter correct date of task";
+    /**
      * Container for components of this form.
-     * @see JPanel
      */
     private JPanel contentPane;
     /**
      * Button to delay the task.
-     * @see JButton
      */
     private JButton delayButton;
     /**
      * Button to complete the task.
-     * @see JButton
      */
     private JButton completeButton;
     /**
      * Component for displaying the details of the task.
-     * @see JLabel
      */
     private JTextArea message;
     /**
      * Component for selecting new date of the task.
-     * @see JSpinner
      */
     private JSpinner dateSpinner;
+    private JLabel err_label;
     /**
-     * Model that provides data for displaying.
-     * @see IModel
+     * Provides data for displaying.
      */
     private IModel model;
     /**
-     * Controller that controls this form.
-     * @see IController
+     * Provides methods to work with data.
      */
     private IController controller;
     /**
@@ -55,6 +55,8 @@ public class MessageDialog extends JDialog implements TaskObserver {
      */
     public MessageDialog(IController c, IModel model) {
         setContentPane(contentPane);
+        setTitle("Notification");
+        message.setBackground(getBackground());
         dateSpinner.setModel(new SpinnerDateModel());
         this.controller = c;
         this.model = model;
@@ -71,24 +73,61 @@ public class MessageDialog extends JDialog implements TaskObserver {
         Task t = model.get(id);
         message.setText(t.toString());
         delayButton.addActionListener(e -> {
+            Date newDate = (Date) dateSpinner.getValue();
 
-            long delta = ((Date) dateSpinner.getValue()).getTime() - Calendar.getInstance().getTimeInMillis();
-            if(delta <= 0)
+            boolean isCorrectDate = isCorrectDate(newDate);
+
+            changeViewDate(isCorrectDate);
+
+            if(isCorrectDate)
             {
-                JOptionPane.showMessageDialog(new JFrame(),"Please enter correct new date");
-            }
-            else {
-                controller.delay(id,(Date)dateSpinner.getValue());
+                if(controller != null) {
+                    controller.delay(id, (Date) dateSpinner.getValue());
+                }
                 dispose();
             }
-        });
 
+        });
         completeButton.addActionListener(e -> {
-            controller.complete(t);
+            if(controller != null) {
+                controller.complete(t);
+            }
             dispose();
         });
         setResizable(false);
-        pack();
         setVisible(true);
+    }
+    /**
+     * Validates the new date.
+     * @param date the new date.
+     * @return true if the date is correct, else - false.
+     */
+    private boolean isCorrectDate(Date date) {
+        long delta = date.getTime() - Calendar.getInstance().getTimeInMillis();
+        return (delta > 0);
+    }
+
+    /**
+     * Invokes method {@link #configDate(String, Border)}  with parameters that
+     * depend on that is the entered date is correct or not.
+     * @param isCorrectDate result of the {@link #isCorrectDate(Date)} method.
+     */
+    private void changeViewDate(boolean isCorrectDate) {
+        if (isCorrectDate) {
+            configDate("", UIManager.getBorder("Spinner.border"));
+        } else {
+            configDate(ENTER_DATE_MSG, BorderFactory.createLineBorder(Color.red));
+        }
+    }
+    /**
+     * Changes appearance of the {@link #dateSpinner} and {@link #err_label}.
+     * @param text text that will be set into {@link #err_label}.
+     * @param border border that will be set into {@link #dateSpinner}.
+     */
+    private void configDate(String text, Border border) {
+        err_label.setForeground(Color.red);
+        err_label.setText(text);
+        dateSpinner.setBorder(border);
+        pack();
     }
 }

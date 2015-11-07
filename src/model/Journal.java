@@ -12,16 +12,6 @@ public class Journal implements Serializable {
 
     private Vector<Task> currentTasks = new Vector<>();
     private Vector<Task> completedTasks = new Vector<>();
-    /*уникальный id задачи, который будет генерироваться (инкрементироваться)
-    Можно будет куда-то в другое место его убрать отсюда,
-    но я пока не знаю куда лучше. Можно, например, будет сдать класс GeneratorID */
-    private static int generatedID;
-    public static int getGeneratedID() {
-        return generatedID++;
-    }
-    public static void setGeneratedID(int generatedID) {
-        Journal.generatedID = generatedID;
-    }
 
     public Task getTask(int index) {
 

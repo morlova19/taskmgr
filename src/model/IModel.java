@@ -2,11 +2,9 @@ package model;
 
 import observer.ListObserver;
 import observer.TaskObserver;
-import to.TransferObject;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
@@ -16,28 +14,36 @@ import java.util.Vector;
  */
 public interface IModel {
     /**
-     * Adding data.
+     * Adds data.
      * @param task data for adding.
+     * @throws TransformerException throws if something was wrong during the transformation process.
+     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @see TransformerException
+     * @see ParserConfigurationException
      */
     void add(Task task) throws TransformerException, ParserConfigurationException;
     /**
-     * Deleting data.
-     * @param id id of task.
+     * Deletes data.
+     * @param id identifier of task.
+     * @throws TransformerException throws if something was wrong during the transformation process.
+     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @see TransformerException
+     * @see ParserConfigurationException
      */
     void delete(int id) throws TransformerException, ParserConfigurationException;
     /**
      * Gets list of data.
-     * @return list of data..
+     * @return list of data.
      */
     Vector<Task> getData();
     /**
-     * Method to register ListObserver object.
+     * Registers ListObserver object.
      * @param o observer.
      * @see ListObserver
      */
     void registerListObserver(ListObserver o);
     /**
-     * Method to register TaskObserver object.
+     * Registers TaskObserver object.
      * @param o observer.
      * @see TaskObserver
      */
@@ -62,11 +68,18 @@ public interface IModel {
      * Invokes for delaying the task.
      * @param id identifier of the task that will be delayed.
      * @param newDate new date of execution of the task.
+     * @throws TransformerException throws if something was wrong during the transformation process.
+     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @see TransformerException
+     * @see ParserConfigurationException
      */
     void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException;
     /**
      * Invokes to complete the task.
-     * @param t task that will be completed.
+     * @throws TransformerException throws if something was wrong during the transformation process.
+     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @see TransformerException
+     * @see ParserConfigurationException
      */
     void complete(Task t) throws TransformerException, ParserConfigurationException;
 }
