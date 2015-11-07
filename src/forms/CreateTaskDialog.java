@@ -1,7 +1,6 @@
 package forms;
 
 import controller.IController;
-import model.Journal;
 import to.GeneratorID;
 import to.TransferObject;
 
@@ -26,7 +25,6 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
      * Constant for error message that will be displayed if the entered date is not correct.
      */
     public static final String ENTER_DATE_MSG = "Please enter correct date of task";
-
     /**
      * Constant for actionCommand.
      */
@@ -204,7 +202,6 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
     private boolean isCorrectName(String name) {
         return (!name.isEmpty());
     }
-
     /**
      * Creates TransferObject with given parameters.
      * @param name the entered name.

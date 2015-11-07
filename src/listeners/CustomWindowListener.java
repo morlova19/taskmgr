@@ -10,7 +10,7 @@ import java.awt.event.WindowListener;
 public interface CustomWindowListener extends WindowListener {
     default void windowOpened(WindowEvent e) {}
 
-    default void windowClosing(WindowEvent e) {}
+    default void windowClosing(WindowEvent e){}
 
     default void windowClosed(WindowEvent e) {}
 

@@ -72,7 +72,9 @@
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <columns value="15"/>
+            </properties>
           </component>
           <component id="a0988" class="javax.swing.JLabel">
             <constraints>
@@ -99,7 +101,9 @@
               <component id="21b68" class="javax.swing.JTextArea" binding="description_tf">
                 <constraints/>
                 <properties>
-                  <rows value="5"/>
+                  <columns value="15"/>
+                  <lineWrap value="true"/>
+                  <rows value="7"/>
                 </properties>
               </component>
             </children>
@@ -123,7 +127,9 @@
               <component id="9ccf2" class="javax.swing.JTextArea" binding="contacts_tf">
                 <constraints/>
                 <properties>
-                  <rows value="5"/>
+                  <columns value="15"/>
+                  <lineWrap value="true"/>
+                  <rows value="7"/>
                 </properties>
               </component>
             </children>

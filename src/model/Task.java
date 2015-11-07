@@ -85,11 +85,11 @@ public class Task {
     @Override
     public synchronized String toString() {
         StringBuffer s = new StringBuffer();
-        s.append("\nName: ")
+        s.append("NAME: ")
                 .append(this.name)
-                .append("\nDescription: ")
+                .append("\nDESCRIPTION: ")
                 .append(this.description)
-                .append("\nContacts: ")
+                .append("\nCONTACTS: ")
                 .append(this.contacts);
         return s.toString();
     }

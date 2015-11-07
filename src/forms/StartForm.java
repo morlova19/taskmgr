@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
@@ -30,9 +31,13 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
      */
     public static final String PLEASE_SELECT_TASK = "Please, select task";
     /**
-     * Constant for title of the message dialog.
+     * Constant for title of the confirm dialog.
      */
     public static final String DELETE = "Delete";
+    /**
+     * Constant for title of the confirm dialog.
+     */
+    public static final String EXIT = "Exit";
     /**
      * Constant for name of the app.
      */
@@ -152,13 +157,17 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         button.addActionListener(this);
     }
 
+    /**
+     * Gets system tray and creates icon  that will be displayed in tray.
+     */
     private void configTray() {
         tray = SystemTray.getSystemTray();
-        Image img = null;
+        String path = "images/icon.png";
+        Image img;
         try {
-            img = ImageIO.read(new File("images/bulb.gif"));
-        } catch (IOException e) {
-            //TODO: draw default img
+            img = ImageIO.read(ClassLoader.getSystemResourceAsStream(path));
+       } catch (IOException | IllegalArgumentException e) {
+            img = getIcon();
         }
         PopupMenu popupMenu = new PopupMenu();
         MenuItem exitItem = new MenuItem("Exit");
@@ -173,6 +182,71 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         trayIcon.setImageAutoSize(true);
     }
 
+    /**
+     * Creates {@link #trayIcon} if it cannot be read from resource file.
+     * @return tray icon.
+     */
+    private BufferedImage getIcon() {
+        int w = 35;
+        int h = w;
+        BufferedImage img;
+        img = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gr = img.createGraphics();
+        gr.setComposite(AlphaComposite.Clear);
+        gr.fillRect(0, 0, w, h);
+        gr.setComposite(AlphaComposite.SrcOver);
+        gr.setColor(Color.BLUE);
+        gr.fillOval(0,0,w,h);
+        gr.setFont(new Font("Arial", Font.BOLD, 18));
+        gr.setColor(Color.YELLOW);
+        gr.drawString("TM",5,24);
+        return img;
+    }
+
+    /**
+     * Removes icon from system tray and sets this form visible.
+     */
+    private void removeFromSystemTray() {
+        setVisible(true);
+        tray.remove(trayIcon);
+    }
+    /**
+     * Asks to confirm deleting the task.
+     * If user confirms, informs to the controller.
+     */
+    private void deleteAction() {
+        int index = taskList.getSelectedIndex();
+        if(index != -1)
+        {
+            int option = JOptionPane.showConfirmDialog(getContentPane(), ARE_YOU_SURE, DELETE, JOptionPane.YES_NO_OPTION);
+            if(option == JOptionPane.YES_OPTION) {
+                if(c != null) {
+                    c.delete(pairs.get(index));
+                }
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(getContentPane(), PLEASE_SELECT_TASK);
+        }
+    }
+
+    /**
+     * Invokes when the user selects which tasks wants to see.
+     * Changes the view and current state of the app.
+     * For example, if the user wants to see completed tasks then
+     * add button will be not available and
+     * the new state will be {@link Main#COMPLETED}.
+     * @param isEnabled property of the addButton.
+     * @param newState new state.
+     */
+    private void changeState(boolean isEnabled, int newState) {
+        addButton.setEnabled(isEnabled);
+        Main.CURRENT = newState;
+        if(c != null) {
+            c.load();
+        }
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -201,36 +275,6 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         }
     }
 
-    private void removeFromSystemTray() {
-        setVisible(true);
-        tray.remove(trayIcon);
-    }
-
-    private void deleteAction() {
-        int index = taskList.getSelectedIndex();
-        if(index != -1)
-        {
-            int option = JOptionPane.showConfirmDialog(getContentPane(), ARE_YOU_SURE, DELETE, JOptionPane.YES_NO_OPTION);
-            if(option == JOptionPane.YES_OPTION) {
-                if(c != null) {
-                    c.delete(pairs.get(index));
-                }
-            }
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(getContentPane(), PLEASE_SELECT_TASK);
-        }
-    }
-
-    private void changeState(boolean isEnabled, int newState) {
-        addButton.setEnabled(isEnabled);
-        Main.CURRENT = newState;
-        if(c != null) {
-            c.load();
-        }
-    }
-
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getSource() == taskList && e.getClickCount() == 2)
@@ -239,7 +283,6 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
             new ShowTaskDialog(c, m, pairs.get(index));
         }
     }
-
     @Override
     public void update() {
         if(m != null)
@@ -258,12 +301,12 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
             }
         }
     }
-
     @Override
     public void windowIconified(WindowEvent e) {
         if(tray != null) {
             try {
                 tray.add(trayIcon);
+                trayIcon.displayMessage("Task manager", "Task manager is here.", TrayIcon.MessageType.INFO);
             } catch (AWTException e1) {
                 System.exit(1);
             }

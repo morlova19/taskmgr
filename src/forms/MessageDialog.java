@@ -39,6 +39,9 @@ public class MessageDialog extends JDialog implements TaskObserver {
      * Component for selecting new date of the task.
      */
     private JSpinner dateSpinner;
+    /**
+     * Label to display error message if the entered date is not correct.
+     */
     private JLabel err_label;
     /**
      * Provides data for displaying.
@@ -74,7 +77,6 @@ public class MessageDialog extends JDialog implements TaskObserver {
         message.setText(t.toString());
         delayButton.addActionListener(e -> {
             Date newDate = (Date) dateSpinner.getValue();
-
             boolean isCorrectDate = isCorrectDate(newDate);
 
             changeViewDate(isCorrectDate);
@@ -94,7 +96,10 @@ public class MessageDialog extends JDialog implements TaskObserver {
             }
             dispose();
         });
+        pack();
         setResizable(false);
+        setAlwaysOnTop(true);
+        setModal(true);
         setVisible(true);
     }
     /**
@@ -128,6 +133,6 @@ public class MessageDialog extends JDialog implements TaskObserver {
         err_label.setForeground(Color.red);
         err_label.setText(text);
         dateSpinner.setBorder(border);
-        pack();
+
     }
 }

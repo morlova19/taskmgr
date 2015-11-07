@@ -11,12 +11,8 @@ import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.nio.file.InvalidPathException;
 import java.text.ParseException;
 
@@ -29,21 +25,25 @@ public class Main {
         try {
             ServerSocket socket = new ServerSocket(9999);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(new JFrame(),"Task manager is already running ");
+            JOptionPane.showMessageDialog(new JFrame(),"Task manager is already running.");
             System.exit(1);
         }
-        String path = "files/";
+        String path = System.getProperty("user.home") + "/taskmgr";
         Journal journal = null;
         JournalManager manager = null;
         try {
             manager = new JournalManager(path);
             journal = manager.readJournal();
-        } catch (ParserConfigurationException | SAXException | ParseException | IOException | InvalidPathException e) {
-             JOptionPane.showMessageDialog(new JFrame(),
-                    e.getMessage(), "Error",
-                     JOptionPane.ERROR_MESSAGE);
-                System.exit(1);
-
+        }
+        catch (SAXException | ParseException | ParserConfigurationException e) {
+            showErrorMessage("Cannot read file with the tasks.");
+        }
+        catch (IOException e) {
+            showErrorMessage("I/O Error");
+        }
+        catch (InvalidPathException e)
+        {
+           showErrorMessage(e.getMessage());
         }
         if(journal != null) {
             journal.reload();
@@ -51,6 +51,12 @@ public class Main {
             IModel model = new Model(manager, journal);
             IController controller = new Controller(model, nSystem);
         }
+    }
+
+    private static void showErrorMessage(String err) {
+        JOptionPane.showMessageDialog(new JFrame(),
+                err, "Error", JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
     }
 
 }

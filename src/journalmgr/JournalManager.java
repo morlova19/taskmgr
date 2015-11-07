@@ -5,7 +5,9 @@ import model.Task;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import to.GeneratorID;
 import to.TransferObject;
 
@@ -73,7 +75,7 @@ public class JournalManager {
             comp_filename = dir +"/tasks_completed.xml";
         }
         else {
-            throw new InvalidPathException(path," Path is not directory");
+            throw new InvalidPathException(path,"Path is not directory");
         }
     }
 
@@ -145,16 +147,21 @@ public class JournalManager {
             transformer.transform(source, result);
     }
 
-    Vector<Task> read(File file) throws ParserConfigurationException, IOException, SAXException, ParseException {
+    Vector<Task> read(File file) throws ParserConfigurationException, IOException, ParseException, SAXException {
         Vector<Task> tasks = new Vector<>();
         if(!file.exists())
         {
             return tasks;
         }
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(file);
-            NodeList taskList = document.getElementsByTagName(TASK_TAG);
+        if (file.length() == 0)
+        {
+            return tasks;
+        }
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document;
+        document = builder.parse(file);
+        NodeList taskList = document.getElementsByTagName(TASK_TAG);
 
             for (int i = 0; i < taskList.getLength(); i++) {
                 NodeList taskFields = taskList.item(i).getChildNodes();
@@ -192,7 +199,6 @@ public class JournalManager {
                 to.setId(id);
                 tasks.add(new Task(to));
             }
-
         return tasks;
 
     }
