@@ -28,6 +28,7 @@ public class Main {
 
         try {
             ServerSocket socket = new ServerSocket(9999);
+
         } catch (IOException e) {
             JOptionPane.showMessageDialog(new JFrame(),"Task manager is already running ");
             System.exit(1);
@@ -38,19 +39,11 @@ public class Main {
         try {
             manager = new JournalManager(path);
             journal = manager.readJournal();
-        } catch (ParserConfigurationException | SAXException | ParseException | IOException e) {
+        } catch (ParserConfigurationException | SAXException | ParseException | IOException | InvalidPathException e) {
              JOptionPane.showMessageDialog(new JFrame(),
                     e.getMessage(), "Error",
                      JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
-
-        }
-        catch (InvalidPathException e)
-        {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
 
         }
         if(journal != null) {
