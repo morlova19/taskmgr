@@ -38,11 +38,13 @@ public class Controller implements IController, TaskObserver {
             this.model = model;
         }
         startForm = new StartForm(this,model);
-        load();
+
         if(nSystem != null) {
             this.nSystem = nSystem;
             nSystem.registerObserver(this);
+            nSystem.startAllCurrentTasks();
         }
+        load();
         startForm.setVisible(true);
     }
 

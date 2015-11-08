@@ -30,7 +30,7 @@
               <maximumSize width="0" height="0"/>
               <minimumSize width="0" height="200"/>
               <selectionMode value="1"/>
-              <visibleRowCount value="15"/>
+              <visibleRowCount value="0"/>
             </properties>
           </component>
         </children>

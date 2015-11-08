@@ -13,7 +13,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -128,6 +127,8 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
         setContentPane(mainPanel);
         setTitle(TASK_MANAGER);
+        taskList.setFixedCellWidth(200);
+        taskList.setVisibleRowCount(15);
         configButton(addButton, ADD_ACTION);
         configButton(deleteButton, DELETE_ACTION);
         taskList.addMouseListener(this);
@@ -149,7 +150,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         addWindowListener(this);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        pack();
+        setResizable(false);
     }
 
     private void configButton(AbstractButton button, String action) {
@@ -158,12 +159,12 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
     }
 
     /**
-     * Gets system tray and creates icon  that will be displayed in tray.
+     * Gets system tray and creates icon that will be displayed in tray.
      */
     private void configTray() {
         tray = SystemTray.getSystemTray();
         String path = "images/icon.png";
-        Image img;
+        Image img = null;
         try {
             img = ImageIO.read(ClassLoader.getSystemResourceAsStream(path));
        } catch (IOException | IllegalArgumentException e) {
@@ -274,13 +275,14 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
                 break;
         }
     }
-
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getSource() == taskList && e.getClickCount() == 2)
         {
             int index = taskList.getSelectedIndex();
-            new ShowTaskDialog(c, m, pairs.get(index));
+            if(index != -1) {
+                new ShowTaskDialog(c, m, pairs.get(index));
+            }
         }
     }
     @Override
@@ -299,6 +301,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
                 }));
                 taskList.setModel(listModel);
             }
+            pack();
         }
     }
     @Override
