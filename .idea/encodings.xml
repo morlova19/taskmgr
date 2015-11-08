@@ -18,5 +18,6 @@
     <file url="file://$PROJECT_DIR$/src/observer/ListObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/TaskObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/start/Main.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/to/TransferObject.java" charset="UTF-8" />
   </component>
 </project>

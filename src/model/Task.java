@@ -84,7 +84,7 @@ public class Task {
     }
     @Override
     public synchronized String toString() {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         s.append("NAME: ")
                 .append(this.name)
                 .append("\nDESCRIPTION: ")

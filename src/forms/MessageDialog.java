@@ -73,8 +73,10 @@ public class MessageDialog extends JDialog implements TaskObserver {
      */
     @Override
     public void update(int id) {
-        Task t = model.get(id);
-        message.setText(t.toString());
+        Task t = model.getCurrentTask(id);
+        if(t != null) {
+            message.setText(t.toString());
+        }
         delayButton.addActionListener(e -> {
             Date newDate = (Date) dateSpinner.getValue();
             boolean isCorrectDate = isCorrectDate(newDate);

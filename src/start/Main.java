@@ -52,7 +52,6 @@ public class Main {
             IController controller = new Controller(model, nSystem);
         }
     }
-
     private static void showErrorMessage(String err) {
         JOptionPane.showMessageDialog(new JFrame(),
                 err, "Error", JOptionPane.ERROR_MESSAGE);

@@ -22,13 +22,14 @@ public class Model implements IModel {
     public Model(JournalManager manager, Journal journal) {
         this.manager = manager;
         this.journal = journal;
-        load();
     }
     @Override
     public void add(Task task) throws TransformerException, ParserConfigurationException {
-        journal.addTask(task);
-        manager.writeJournal(journal);
-        notifyListObserver();
+        if(task != null) {
+            journal.addTask(task);
+            manager.writeJournal(journal);
+            notifyListObserver();
+        }
     }
 
     @Override
@@ -37,8 +38,8 @@ public class Model implements IModel {
         if(t != null) {
             journal.deleteTask(t);
             manager.writeJournal(journal);
+            notifyListObserver();
         }
-        notifyListObserver();
     }
 
     @Override
@@ -59,6 +60,10 @@ public class Model implements IModel {
     @Override
     public Task get(int id) {
         return journal.getTask(id);
+    }
+    @Override
+    public Task getCurrentTask(int id) {
+        return journal.getCurrentTask(id);
     }
 
     @Override
@@ -82,6 +87,7 @@ public class Model implements IModel {
         journal.setCompleted(t);
         manager.writeJournal(journal);
         notifyListObserver();
+
     }
 
     private void notifyListObserver() {

@@ -41,8 +41,8 @@ public class Controller implements IController, TaskObserver {
 
         if(nSystem != null) {
             this.nSystem = nSystem;
-            nSystem.registerObserver(this);
-            nSystem.startAllCurrentTasks();
+            this.nSystem.registerObserver(this);
+            this.nSystem.startAllCurrentTasks();
         }
         load();
         startForm.setVisible(true);
@@ -66,7 +66,6 @@ public class Controller implements IController, TaskObserver {
     {
         try {
             model.delete(id);
-
         } catch (TransformerException | ParserConfigurationException e) {
             displayErrorMessage();
         }
@@ -88,23 +87,28 @@ public class Controller implements IController, TaskObserver {
     @Override
     public void delay(int id, Date newDate) {
         Task t = model.get(id);
-        try {
-            model.delay(id, newDate);
-        } catch (TransformerException | ParserConfigurationException e) {
-            displayErrorMessage();
-        }
-        finally {
-            nSystem.delayTask(t.getID());
+        if(t != null) {
+            try {
+                model.delay(id, newDate);
+            } catch (TransformerException | ParserConfigurationException e) {
+                displayErrorMessage();
+            } finally {
+                nSystem.delayTask(t.getID());
+            }
         }
     }
     @Override
     public void complete(Task t)
     {
-        try {
-            model.complete(t);
-        } catch (TransformerException | ParserConfigurationException e) {
-            displayErrorMessage();
+        if(t != null)
+        {
+            try {
+                model.complete(t);
+            } catch (TransformerException | ParserConfigurationException e) {
+                displayErrorMessage();
+            }
         }
+
     }
 
     @Override
@@ -112,7 +116,6 @@ public class Controller implements IController, TaskObserver {
         mObserver = new MessageDialog(this,model);
         mObserver.update(id);
     }
-
     /**
      * Displays error message.
      */

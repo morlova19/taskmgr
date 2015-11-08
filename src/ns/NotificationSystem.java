@@ -1,7 +1,6 @@
 package ns;
 
 import model.Journal;
-import model.Task;
 import observer.TaskObserver;
 
 import java.util.*;

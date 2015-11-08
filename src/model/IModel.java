@@ -16,8 +16,8 @@ public interface IModel {
     /**
      * Adds data.
      * @param task data for adding.
-     * @throws TransformerException throws if something was wrong during the transformation process.
-     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @throws TransformerException thrown if something was wrong during the transformation process.
+     * @throws ParserConfigurationException thrown if there was a serious configuration error.
      * @see TransformerException
      * @see ParserConfigurationException
      */
@@ -25,8 +25,8 @@ public interface IModel {
     /**
      * Deletes data.
      * @param id identifier of task.
-     * @throws TransformerException throws if something was wrong during the transformation process.
-     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @throws TransformerException thrown if something was wrong during the transformation process.
+     * @throws ParserConfigurationException thrown if there was a serious configuration error.
      * @see TransformerException
      * @see ParserConfigurationException
      */
@@ -56,6 +56,13 @@ public interface IModel {
      */
     Task get(int id);
     /**
+     * Gets the current task by identifier.
+     * Returns null if the task was not found.
+     * @param id identifier of the task.
+     * @return task that was found.
+     */
+    Task getCurrentTask(int id);
+    /**
      * Loads information about the task which has the given identifier.
      * @param id identifier of the task.
      */
@@ -68,16 +75,16 @@ public interface IModel {
      * Invokes for delaying the task.
      * @param id identifier of the task that will be delayed.
      * @param newDate new date of execution of the task.
-     * @throws TransformerException throws if something was wrong during the transformation process.
-     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @throws TransformerException thrown if something was wrong during the transformation process.
+     * @throws ParserConfigurationException thrown if there was a serious configuration error.
      * @see TransformerException
      * @see ParserConfigurationException
      */
     void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException;
     /**
      * Invokes to complete the task.
-     * @throws TransformerException throws if something was wrong during the transformation process.
-     * @throws ParserConfigurationException throws if there was a serious configuration error.
+     * @throws TransformerException thrown if something was wrong during the transformation process.
+     * @throws ParserConfigurationException thrown if there was a serious configuration error.
      * @see TransformerException
      * @see ParserConfigurationException
      */

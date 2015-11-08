@@ -138,7 +138,6 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
         {
             changeView(isCorrectName, isCorrectDate);
             if(controller != null) {
-                System.out.println(desc.length());
                 controller.add(createTransferObject(name, date, desc, contacts));
             }
             dispose();

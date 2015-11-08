@@ -112,7 +112,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
     private final String DISPLAY_COMPLETED_ACTION = "display completed";
     /**
      * Thread-safe array in which index this is number of the task in {@link #taskList}
-     * and pairs[index] this is identifier of this task.
+     * and value of this element in array this is identifier of this task.
      */
     private AtomicIntegerArray pairs;
     /**
@@ -127,6 +127,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
         setContentPane(mainPanel);
         setTitle(TASK_MANAGER);
+        setIconImage(getIcon());
         taskList.setFixedCellWidth(200);
         taskList.setVisibleRowCount(15);
         configButton(addButton, ADD_ACTION);
@@ -163,13 +164,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
      */
     private void configTray() {
         tray = SystemTray.getSystemTray();
-        String path = "images/icon.png";
-        Image img = null;
-        try {
-            img = ImageIO.read(ClassLoader.getSystemResourceAsStream(path));
-       } catch (IOException | IllegalArgumentException e) {
-            img = getIcon();
-        }
+        Image img = getIcon();
         PopupMenu popupMenu = new PopupMenu();
         MenuItem exitItem = new MenuItem("Exit");
         MenuItem openItem = new MenuItem("Open");
@@ -184,15 +179,29 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
     }
 
     /**
-     * Creates {@link #trayIcon} if it cannot be read from resource file.
-     * @return tray icon.
+     * Creates icon of the app.
+     * @return icon.
      */
-    private BufferedImage getIcon() {
+    private Image getIcon() {
+        Image img;
+        String path = "images/icon.png";
+        try {
+            img = ImageIO.read(ClassLoader.getSystemResourceAsStream(path));
+        } catch (IOException | IllegalArgumentException e) {
+            img = drawIcon();
+        }
+        return img;
+    }
+    /**
+     * Draws icon of app if it cannot be read from resource file.
+     * @return icon.
+     */
+    private Image drawIcon() {
+        Image img;
         int w = 35;
         int h = w;
-        BufferedImage img;
         img = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gr = img.createGraphics();
+        Graphics2D gr = ((BufferedImage)img).createGraphics();
         gr.setComposite(AlphaComposite.Clear);
         gr.fillRect(0, 0, w, h);
         gr.setComposite(AlphaComposite.SrcOver);
@@ -203,11 +212,11 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         gr.drawString("TM",5,24);
         return img;
     }
-
     /**
      * Removes icon from system tray and sets this form visible.
      */
-    private void removeFromSystemTray() {
+    private void removeFromTray() {
+        setExtendedState(JFrame.NORMAL);
         setVisible(true);
         tray.remove(trayIcon);
     }
@@ -266,7 +275,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
                 changeState(true, Main.NOTCOMPLETED);
                 break;
             case OPEN_ACTION:
-                removeFromSystemTray();
+                removeFromTray();
                 break;
             case EXIT_ACTION:
                 System.exit(0);
