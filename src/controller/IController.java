@@ -1,6 +1,5 @@
 package controller;
 
-import model.Task;
 import to.TransferObject;
 
 import java.util.Date;

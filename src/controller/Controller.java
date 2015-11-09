@@ -40,13 +40,14 @@ public class Controller implements IController, TaskObserver {
         }
         if(nSystem != null) {
             this.nSystem = nSystem;
-            nSystem.registerObserver(this);
+            this.nSystem.setController(this);
+            this.nSystem.registerObserver(this);
             int tempCurrent = Main.CURRENT;
             Main.CURRENT = Main.NOTCOMPLETED;
             Vector<Integer> currentTasksID = model.getIDs();
             Main.CURRENT = tempCurrent;
             for(int i: currentTasksID) {
-                nSystem.startTask(i);
+                this.nSystem.startTask(i);
             }
         }
         startForm = new StartForm(this,model);
@@ -93,7 +94,7 @@ public class Controller implements IController, TaskObserver {
     }
     @Override
     public void delay(int id, Date newDate) {
-        Task t = model.get(id);
+        Task t = model.getCurrentTask(id);
         try {
             model.delay(id, newDate);
         } catch (TransformerException | ParserConfigurationException e) {

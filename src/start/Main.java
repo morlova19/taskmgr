@@ -57,7 +57,7 @@ public class Main {
             IModel model = new Model(manager, journal);
             INotificationSystem nSystem = new CustomNotificationSystem();
             IController controller = new Controller(model, nSystem);
-            nSystem.setController(controller);
+           // nSystem.setController(controller);
         }
     }
     private static void showErrorMessage(String err) {

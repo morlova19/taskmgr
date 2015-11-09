@@ -90,4 +90,10 @@ public class Journal implements Serializable {
        if (Main.CURRENT == Main.COMPLETED) return completedTasks;
        else return currentTasks;
     }
+
+    public Task getCurrentTask(int id) {
+        return currentTasks.stream()
+                .filter(task -> task.getID() == id)
+                .findFirst().get();
+    }
 }

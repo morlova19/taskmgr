@@ -8,13 +8,23 @@ import observer.TaskObserver;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
  * GUI to display notification about the task.
  */
-public class MessageDialog extends JDialog implements TaskObserver {
+public class MessageDialog extends JDialog implements TaskObserver, ActionListener {
+    /**
+     * Constant for actionCommand.
+     */
+    private static final String DELAY_ACTION = "delay";
+    /**
+     * Constant for actionCommand.
+     */
+    private static final String COMPLETE_ACTION = "complete";
     /**
      * Constant for error message that will be displayed if the entered date is not correct.
      */
@@ -51,6 +61,8 @@ public class MessageDialog extends JDialog implements TaskObserver {
      * Provides methods to work with data.
      */
     private IController controller;
+
+    private int id;
     /**
      * Creates new dialog window.
      * @param c controller.
@@ -59,10 +71,20 @@ public class MessageDialog extends JDialog implements TaskObserver {
     public MessageDialog(IController c, IModel model) {
         setContentPane(contentPane);
         setTitle("Notification");
+
         message.setBackground(getBackground());
+
         dateSpinner.setModel(new SpinnerDateModel());
+
+        delayButton.setActionCommand(DELAY_ACTION);
+        delayButton.addActionListener(this);
+
+        completeButton.addActionListener(this);
+        completeButton.setActionCommand(COMPLETE_ACTION);
+
         this.controller = c;
         this.model = model;
+
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
@@ -73,33 +95,25 @@ public class MessageDialog extends JDialog implements TaskObserver {
      */
     @Override
     public void update(int id) {
-        message.setText(model.get(id).toString());
-        delayButton.addActionListener(e -> {
-            Date newDate = (Date) dateSpinner.getValue();
-            boolean isCorrectDate = isCorrectDate(newDate);
-
-            changeViewDate(isCorrectDate);
-
-            if(isCorrectDate)
-            {
-                if(controller != null) {
-                    controller.delay(id, (Date) dateSpinner.getValue());
-                }
-                dispose();
-            }
-
-        });
-        completeButton.addActionListener(e -> {
-            if(controller != null) {
-                controller.complete(id);
-            }
-            dispose();
-        });
-        pack();
+        message.setText(model.getCurrentTask(id).toString());
+        this.id = id;
         setResizable(false);
         setAlwaysOnTop(true);
         setModal(true);
+        pack();
         setVisible(true);
+    }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch (e.getActionCommand())
+        {
+            case DELAY_ACTION:
+                delay();
+                break;
+            case COMPLETE_ACTION:
+                complete();
+                break;
+        }
     }
     /**
      * Validates the new date.
@@ -133,5 +147,31 @@ public class MessageDialog extends JDialog implements TaskObserver {
         err_label.setText(text);
         dateSpinner.setBorder(border);
 
+    }
+    /**
+     * Informs controller about that user wants to delay the task.
+     */
+    private void delay() {
+        Date newDate = (Date) dateSpinner.getValue();
+        boolean isCorrectDate = isCorrectDate(newDate);
+
+        changeViewDate(isCorrectDate);
+
+        if(isCorrectDate)
+        {
+            if(controller != null) {
+                controller.delay(id, (Date) dateSpinner.getValue());
+            }
+            dispose();
+        }
+    }
+    /**
+     * Informs controller about that user wants to complete the task.
+     */
+    private void complete() {
+        if(controller != null) {
+            controller.complete(id);
+        }
+        dispose();
     }
 }
