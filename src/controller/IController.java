@@ -37,7 +37,12 @@ public interface IController {
     void delay(int id, Date newDate);
     /**
      * Invokes to complete the task.
-     * @param t identifier of the task that will be completed.
+     * @param id identifier of the task that will be completed.
      */
-    void complete(Task t);
+    void complete(int id);
+    /**
+     * Invokes to get completion date of the task.
+     * @return date for the task with identifier @param id
+     */
+    Date getTaskDate(int id);
 }

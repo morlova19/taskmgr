@@ -4,7 +4,7 @@ import forms.MessageDialog;
 import forms.StartForm;
 import model.IModel;
 import model.Task;
-import ns.NotificationSystem;
+import ns.INotificationSystem;
 import observer.TaskObserver;
 import start.Main;
 import to.TransferObject;
@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.util.Date;
+import java.util.Vector;
 
 public class Controller implements IController, TaskObserver {
     /**
@@ -24,7 +25,7 @@ public class Controller implements IController, TaskObserver {
      */
     private IModel model;
 
-    private NotificationSystem nSystem;
+    private INotificationSystem nSystem;
     
     private TaskObserver mObserver;
     /**
@@ -32,18 +33,23 @@ public class Controller implements IController, TaskObserver {
      * Creates and displays GUI.
      * @param model model.
      */
-    public Controller(IModel model, NotificationSystem nSystem)  {
+    public Controller(IModel model, INotificationSystem nSystem)  {
         if(model != null)
         {
             this.model = model;
         }
-        startForm = new StartForm(this,model);
-
         if(nSystem != null) {
             this.nSystem = nSystem;
             nSystem.registerObserver(this);
-            nSystem.startAllCurrentTasks();
+            int tempCurrent = Main.CURRENT;
+            Main.CURRENT = Main.NOTCOMPLETED;
+            Vector<Integer> currentTasksID = model.getIDs();
+            Main.CURRENT = tempCurrent;
+            for(int i: currentTasksID) {
+                nSystem.startTask(i);
+            }
         }
+        startForm = new StartForm(this,model);
         load();
         startForm.setVisible(true);
     }
@@ -98,13 +104,21 @@ public class Controller implements IController, TaskObserver {
         }
     }
     @Override
-    public void complete(Task t)
+    public void complete(int id)
     {
         try {
-            model.complete(t);
+            model.complete(id);
         } catch (TransformerException | ParserConfigurationException e) {
             displayErrorMessage();
         }
+        finally {
+            nSystem.cancelTask(id);
+        }
+    }
+
+    @Override
+    public Date getTaskDate(int id) {
+        return model.get(id).getDate();
     }
 
     @Override

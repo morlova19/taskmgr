@@ -1,7 +1,6 @@
 package ns;
 
 import model.Journal;
-import model.Task;
 import observer.TaskObserver;
 
 import java.util.*;
@@ -9,7 +8,7 @@ import java.util.*;
 /**
  * Part of taskmgr.
  */
-public class NotificationSystem { //test
+public class NotificationSystem  {
     private class NotifyTask extends TimerTask {
         private TaskObserver observer;
         private int id;

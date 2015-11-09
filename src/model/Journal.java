@@ -13,18 +13,18 @@ public class Journal implements Serializable {
     private Vector<Task> currentTasks = new Vector<>();
     private Vector<Task> completedTasks = new Vector<>();
 
-    public Task getTask(int index) {
+    public Task getTask(int id) {
 
         if (Main.CURRENT == Main.COMPLETED)
         {
             return completedTasks.stream()
-                    .filter(task -> task.getID() == index)
+                    .filter(task -> task.getID() == id)
                     .findFirst().get();
         }
         else
         {
             return currentTasks.stream()
-                    .filter(task -> task.getID() == index)
+                    .filter(task -> task.getID() == id)
                     .findFirst().get();
         }
     }
@@ -40,7 +40,7 @@ public class Journal implements Serializable {
         else currentTasks.remove(task);
     }
 
-    void delayTask(int id, Date newDate) {// откладывает задачу на одну минуту
+    void delayTask(int id, Date newDate) {
         Task t = currentTasks
                 .stream()
                 .filter(task -> task.getID() == id)
@@ -86,7 +86,7 @@ public class Journal implements Serializable {
         }
     }
 
-   Vector<Task> getTasks() { //Нужно следить за порядком следования
+   Vector<Task> getTasks() {
        if (Main.CURRENT == Main.COMPLETED) return completedTasks;
        else return currentTasks;
     }
