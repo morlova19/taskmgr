@@ -15,7 +15,21 @@ public class Journal implements Serializable {
 
     public Task getTask(int id) {
 
-        if (Main.CURRENT == Main.COMPLETED)
+        for(Task t: completedTasks)
+        {
+            if(t.getID() == id)
+            {
+                return t;
+            }
+        }
+        for(Task t: currentTasks)
+        {
+            if(t.getID() == id)
+            {
+                return t;
+            }
+        }
+     /*  if (Main.CURRENT == Main.COMPLETED)
         {
             return completedTasks.stream()
                     .filter(task -> task.getID() == id)
@@ -26,7 +40,8 @@ public class Journal implements Serializable {
             return currentTasks.stream()
                     .filter(task -> task.getID() == id)
                     .findFirst().get();
-        }
+        }*/
+       return null;
     }
 
     void addTask(Task newTask) {
