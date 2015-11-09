@@ -88,5 +88,7 @@ public interface IModel {
      * @see TransformerException
      * @see ParserConfigurationException
      */
-    void complete(Task t) throws TransformerException, ParserConfigurationException;
+    void complete(int id) throws TransformerException, ParserConfigurationException;
+
+    public Vector<Integer> getIDs();
 }

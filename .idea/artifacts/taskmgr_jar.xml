@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="taskmgr:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/taskmgr_jar</output-path>
+    <root id="archive" name="taskmgr.jar">
+      <element id="module-output" name="taskmgr" />
+    </root>
+  </artifact>
+</component>

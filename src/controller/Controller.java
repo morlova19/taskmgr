@@ -4,7 +4,7 @@ import forms.MessageDialog;
 import forms.StartForm;
 import model.IModel;
 import model.Task;
-import ns.NotificationSystem;
+import ns.INotificationSystem;
 import observer.TaskObserver;
 import start.Main;
 import to.TransferObject;
@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.util.Date;
+import java.util.Vector;
 
 public class Controller implements IController, TaskObserver {
     /**
@@ -24,7 +25,7 @@ public class Controller implements IController, TaskObserver {
      */
     private IModel model;
 
-    private NotificationSystem nSystem;
+    private INotificationSystem nSystem;
     
     private TaskObserver mObserver;
     /**
@@ -32,18 +33,23 @@ public class Controller implements IController, TaskObserver {
      * Creates and displays GUI.
      * @param model model.
      */
-    public Controller(IModel model, NotificationSystem nSystem)  {
+    public Controller(IModel model, INotificationSystem nSystem)  {
         if(model != null)
         {
             this.model = model;
         }
-        startForm = new StartForm(this,model);
-
         if(nSystem != null) {
             this.nSystem = nSystem;
-            this.nSystem.registerObserver(this);
-            this.nSystem.startAllCurrentTasks();
+            nSystem.registerObserver(this);
+            int tempCurrent = Main.CURRENT;
+            Main.CURRENT = Main.NOTCOMPLETED;
+            Vector<Integer> currentTasksID = model.getIDs();
+            Main.CURRENT = tempCurrent;
+            for(int i: currentTasksID) {
+                nSystem.startTask(i);
+            }
         }
+        startForm = new StartForm(this,model);
         load();
         startForm.setVisible(true);
     }
@@ -66,6 +72,7 @@ public class Controller implements IController, TaskObserver {
     {
         try {
             model.delete(id);
+
         } catch (TransformerException | ParserConfigurationException e) {
             displayErrorMessage();
         }
@@ -87,28 +94,31 @@ public class Controller implements IController, TaskObserver {
     @Override
     public void delay(int id, Date newDate) {
         Task t = model.get(id);
-        if(t != null) {
-            try {
-                model.delay(id, newDate);
-            } catch (TransformerException | ParserConfigurationException e) {
-                displayErrorMessage();
-            } finally {
-                nSystem.delayTask(t.getID());
-            }
+        try {
+            model.delay(id, newDate);
+        } catch (TransformerException | ParserConfigurationException e) {
+            displayErrorMessage();
+        }
+        finally {
+            nSystem.delayTask(t.getID());
         }
     }
     @Override
-    public void complete(Task t)
+    public void complete(int id)
     {
-        if(t != null)
-        {
-            try {
-                model.complete(t);
-            } catch (TransformerException | ParserConfigurationException e) {
-                displayErrorMessage();
-            }
+        try {
+            model.complete(id);
+        } catch (TransformerException | ParserConfigurationException e) {
+            displayErrorMessage();
         }
+        finally {
+            nSystem.cancelTask(id);
+        }
+    }
 
+    @Override
+    public Date getTaskDate(int id) {
+        return model.get(id).getDate();
     }
 
     @Override
@@ -116,6 +126,7 @@ public class Controller implements IController, TaskObserver {
         mObserver = new MessageDialog(this,model);
         mObserver.update(id);
     }
+
     /**
      * Displays error message.
      */

@@ -6,11 +6,13 @@ import model.IModel;
 import model.Journal;
 import journalmgr.JournalManager;
 import model.Model;
-import ns.NotificationSystem;
+import ns.CustomNotificationSystem;
+import ns.INotificationSystem;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.InvalidPathException;
@@ -47,9 +49,15 @@ public class Main {
         }
         if(journal != null) {
             journal.reload();
-            NotificationSystem nSystem = new NotificationSystem(journal);
+            try {
+                manager.writeJournal(journal);
+            } catch (TransformerException | ParserConfigurationException e) {
+                showErrorMessage("Cannot write to file with the tasks.");
+            }
             IModel model = new Model(manager, journal);
+            INotificationSystem nSystem = new CustomNotificationSystem();
             IController controller = new Controller(model, nSystem);
+            nSystem.setController(controller);
         }
     }
     private static void showErrorMessage(String err) {

@@ -83,11 +83,21 @@ public class Model implements IModel {
     }
 
     @Override
-    public void complete(Task t) throws TransformerException, ParserConfigurationException {
-        journal.setCompleted(t);
+    public void complete(int id) throws TransformerException, ParserConfigurationException {
+        journal.setCompleted(journal.getTask(id));
         manager.writeJournal(journal);
         notifyListObserver();
 
+    }
+
+    @Override
+    public Vector<Integer> getIDs() {
+        Vector<Integer> idVector = new Vector<>();
+        Vector<Task> tasks = journal.getTasks();
+        for(Task t: tasks) {
+            idVector.add(t.getID());
+        }
+        return idVector;
     }
 
     private void notifyListObserver() {
