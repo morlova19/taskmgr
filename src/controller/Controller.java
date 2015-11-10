@@ -12,6 +12,7 @@ import to.TransferObject;
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.awt.*;
 import java.util.Date;
 import java.util.Vector;
 
@@ -40,14 +41,11 @@ public class Controller implements IController, TaskObserver {
         }
         if(nSystem != null) {
             this.nSystem = nSystem;
-            this.nSystem.setController(this);
             this.nSystem.registerObserver(this);
-            int tempCurrent = Main.CURRENT;
             Main.CURRENT = Main.NOTCOMPLETED;
-            Vector<Integer> currentTasksID = model.getIDs();
-            Main.CURRENT = tempCurrent;
-            for(int i: currentTasksID) {
-                this.nSystem.startTask(i);
+            Vector<Task> currentTasksID = model.getData();
+            for(Task i: currentTasksID) {
+                this.nSystem.startTask(i.getID(),i.getDate());
             }
         }
         startForm = new StartForm(this,model);
@@ -63,7 +61,7 @@ public class Controller implements IController, TaskObserver {
             displayErrorMessage();
         }
         finally {
-            nSystem.startTask(t.getID());
+            nSystem.startTask(t.getID(),t.getDate());
         }
     }
     @Override
@@ -97,7 +95,7 @@ public class Controller implements IController, TaskObserver {
             displayErrorMessage();
         }
         finally {
-            nSystem.delayTask(t.getID());
+            nSystem.delayTask(t.getID(),t.getDate());
         }
     }
     @Override
@@ -114,16 +112,11 @@ public class Controller implements IController, TaskObserver {
     }
 
     @Override
-    public Date getTaskDate(int id) {
-        return model.get(id).getDate();
-    }
-
-    @Override
     public void update(int id) {
         mObserver = new MessageDialog(this,model);
         mObserver.update(id);
-    }
 
+    }
     /**
      * Displays error message.
      */

@@ -8,6 +8,7 @@ import journalmgr.JournalManager;
 import model.Model;
 import ns.CustomNotificationSystem;
 import ns.INotificationSystem;
+import ns.NotificationSystem;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
@@ -57,7 +58,6 @@ public class Main {
             IModel model = new Model(manager, journal);
             INotificationSystem nSystem = new CustomNotificationSystem();
             IController controller = new Controller(model, nSystem);
-           // nSystem.setController(controller);
         }
     }
     private static void showErrorMessage(String err) {

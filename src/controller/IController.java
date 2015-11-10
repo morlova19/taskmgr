@@ -39,9 +39,4 @@ public interface IController {
      * @param id identifier of the task that will be completed.
      */
     void complete(int id);
-    /**
-     * Invokes to get completion date of the task.
-     * @return date for the task with identifier @param id
-     */
-    Date getTaskDate(int id);
 }

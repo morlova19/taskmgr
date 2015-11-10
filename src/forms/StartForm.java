@@ -231,7 +231,13 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
             int option = JOptionPane.showConfirmDialog(getContentPane(), ARE_YOU_SURE, DELETE, JOptionPane.YES_NO_OPTION);
             if(option == JOptionPane.YES_OPTION) {
                 if(c != null) {
-                    c.delete(pairs.get(index));
+                    try {
+                        c.delete(pairs.get(index));
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        c.load();
+                    }
                 }
             }
         }

@@ -1,8 +1,8 @@
 package ns;
 
-
-import controller.IController;
 import observer.TaskObserver;
+
+import java.util.Date;
 
 /**
  * Interface of notification system.
@@ -14,12 +14,12 @@ public interface INotificationSystem {
      * Sets the link to controller connected
      * with this notification system
      */
-    void setController(IController controller);
+   // void setController(IController controller);
     /**
      * Registers the task with identifier @param id
      * in the check list
      */
-    void startTask(int id);
+    void startTask(int id, Date time);
     /**
      * Deletes the task with identifier @param id
      * from the check list
@@ -30,7 +30,7 @@ public interface INotificationSystem {
      * Updates the time of task with identifier @param id
      * and registers in the check list
      */
-    void delayTask(int id);
+    void delayTask(int id, Date time);
     /**
      * Registers an observer which would be notified
      */

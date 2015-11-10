@@ -3,10 +3,9 @@ package ns;
 import controller.IController;
 import observer.TaskObserver;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Part of taskmgr.
@@ -14,23 +13,17 @@ import java.util.Map;
 public class CustomNotificationSystem implements INotificationSystem, Runnable{
 
     private TaskObserver observer;
-    private IController controller;
-    private Map<Integer, Long> map;
+    private ConcurrentHashMap<Integer, Long> map;
     private Thread thread;
 
     public CustomNotificationSystem() {
-        map = Collections.synchronizedMap(new HashMap<>());
+        map = new ConcurrentHashMap<>();
         thread = new Thread(this);
     }
 
     @Override
-    public void setController(IController controller) {
-        this.controller = controller;
-    }
-
-    @Override
-    public void startTask(int id) {
-        map.put(id, controller.getTaskDate(id).getTime());
+    public void startTask(int id, Date time) {
+        map.put(id, time.getTime());
         if(!thread.isAlive()) {
 
             thread.start();
@@ -41,6 +34,7 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
             case NEW:
                 thread.start();
         }
+
     }
     @Override
     public void cancelTask(int id) {
@@ -52,10 +46,11 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
                 thread.start();
         }
     }
+
     @Override
-    public void delayTask(int id) {
+    public void delayTask(int id, Date time) {
         map.remove(id);
-        startTask(id);
+        startTask(id,time);
     }
     @Override
     public void registerObserver(TaskObserver o) {
@@ -64,14 +59,12 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
 
     private void checkTimer() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
-            for (Integer id : map.keySet()) {
-                if (map.get(id) < currentTime) {
-                    observer.update(id);
-                    thread.interrupt();
-                }
+        for (Integer id : map.keySet()) {
+            if (map.get(id) < currentTime) {
+               observer.update(id);
             }
+        }
     }
-
     @Override
     public void run() {
         thread.setPriority(Thread.MIN_PRIORITY);
