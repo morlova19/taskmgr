@@ -2,6 +2,7 @@ package ns;
 
 import observer.TaskObserver;
 
+import java.awt.Toolkit;
 import java.util.*;
 
 public class NotificationSystem implements INotificationSystem{
@@ -14,6 +15,7 @@ public class NotificationSystem implements INotificationSystem{
             this.observer = o;
         }
         public void  run() {
+            Toolkit.getDefaultToolkit().beep();
             if(this.observer != null) {
                 this.observer.update(id);
             }

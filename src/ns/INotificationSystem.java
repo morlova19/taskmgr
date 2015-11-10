@@ -31,7 +31,7 @@ public interface INotificationSystem {
      */
     void delayTask(int id, Date time);
     /**
-     * Registers an observer which would be notified
+     * Registers an observer which should be notified
      */
     void registerObserver(TaskObserver o);
 }

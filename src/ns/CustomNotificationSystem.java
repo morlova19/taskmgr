@@ -2,6 +2,7 @@ package ns;
 
 import observer.TaskObserver;
 
+import java.awt.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,32 +18,16 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
     public CustomNotificationSystem() {
         map = new ConcurrentHashMap<>();
         thread = new Thread(this);
+        thread.start();
     }
 
     @Override
     public void startTask(int id, Date time) {
         map.put(id, time.getTime());
-        if(!thread.isAlive()) {
-
-            thread.start();
-        }
-        switch (thread.getState()) {
-            case TERMINATED:
-                thread = new Thread(this);
-            case NEW:
-                thread.start();
-        }
-
     }
     @Override
     public void cancelTask(int id) {
         map.remove(id);
-        switch (thread.getState()) {
-            case TERMINATED:
-                thread = new Thread(this);
-            case NEW:
-                thread.start();
-        }
     }
 
     @Override
@@ -57,23 +42,28 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
 
     private void checkTimer() {
         long currentTime = Calendar.getInstance().getTimeInMillis();
-        for (Integer id : map.keySet()) {
-            if (map.get(id) < currentTime) {
-               observer.update(id);
+        Iterator<Integer> iterator = map.keySet().iterator();
+        if (iterator.hasNext()) {
+            Integer id = iterator.next();
+            while (iterator.hasNext() && (map.get(id) > currentTime)) {
+                id = iterator.next();
+            }
+            if (map.get(id) <= currentTime) {
+                observer.update(id);
+                Toolkit.getDefaultToolkit().beep();
             }
         }
     }
     @Override
     public void run() {
-        thread.setPriority(Thread.MIN_PRIORITY);
-        while(!thread.isInterrupted()) {
-            checkTimer();
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        while(!Thread.currentThread().isInterrupted()) {
+                checkTimer();
             try {
-                thread.sleep(10000); //wait 10 seconds
+                Thread.currentThread().sleep(5000); //wait 5 seconds
             } catch (InterruptedException e) {
-                thread.interrupt();
+                Thread.currentThread().interrupt();
             }
         }
-        thread = new Thread(this);
     }
 }

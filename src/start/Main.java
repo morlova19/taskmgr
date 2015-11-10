@@ -24,7 +24,6 @@ public class Main {
     public static final int COMPLETED = 2;
     public static int CURRENT = NOTCOMPLETED;
     public static void main(String[] args) {
-
         try {
             ServerSocket socket = new ServerSocket(9999);
         } catch (IOException e) {
