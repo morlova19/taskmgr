@@ -12,23 +12,18 @@ import to.TransferObject;
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.awt.*;
 import java.util.Date;
 import java.util.Vector;
 
 public class Controller implements IController, TaskObserver {
     /**
-     * Starting GUI of application.
-     */
-    private StartForm startForm;
-    /**
      * Model that works with data.
      */
     private IModel model;
-
+    /**
+     * Notification system.
+     */
     private INotificationSystem nSystem;
-    
-    private TaskObserver mObserver;
     /**
      * Constructs new controller.
      * Creates and displays GUI.
@@ -48,7 +43,7 @@ public class Controller implements IController, TaskObserver {
                 this.nSystem.startTask(i.getID(),i.getDate());
             }
         }
-        startForm = new StartForm(this,model);
+        StartForm startForm = new StartForm(this, model);
         load();
         startForm.setVisible(true);
     }
@@ -113,7 +108,7 @@ public class Controller implements IController, TaskObserver {
 
     @Override
     public void update(int id) {
-        mObserver = new MessageDialog(this,model);
+        TaskObserver mObserver = new MessageDialog(this, model);
         mObserver.update(id);
 
     }

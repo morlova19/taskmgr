@@ -10,14 +10,12 @@ import java.util.Date;
  * the task's time comes.
  */
 public interface INotificationSystem {
-    /**
-     * Sets the link to controller connected
-     * with this notification system
-     */
-   // void setController(IController controller);
+
     /**
      * Registers the task with identifier @param id
      * in the check list
+     * @param id task's identifier.
+     * @param time task's time.
      */
     void startTask(int id, Date time);
     /**
@@ -25,10 +23,11 @@ public interface INotificationSystem {
      * from the check list
      */
     void cancelTask(int id);
-
     /**
      * Updates the time of task with identifier @param id
      * and registers in the check list
+     * @param id task's identifier.
+     * @param time new task's time.
      */
     void delayTask(int id, Date time);
     /**
