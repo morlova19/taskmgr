@@ -55,16 +55,10 @@ public interface IModel {
      * @return task that was found.
      */
     Task get(int id);
+
     /**
-     * Gets the current task by identifier.
-     * Returns null if the task was not found.
-     * @param id identifier of the task.
-     * @return task that was found.
-     */
-    Task getCurrentTask(int id);
-    /**
-     * Loads information about the task which has the given identifier.
-     * @param id identifier of the task.
+     * Invokes when need to display task's details.
+     * @param id task's identifier.
      */
     void show(int id);
     /**
@@ -90,5 +84,5 @@ public interface IModel {
      */
     void complete(int id) throws TransformerException, ParserConfigurationException;
 
-    public Vector<Integer> getIDs();
+    Vector<Integer> getIDs();
 }

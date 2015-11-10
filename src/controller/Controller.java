@@ -54,7 +54,6 @@ public class Controller implements IController, TaskObserver {
         load();
         startForm.setVisible(true);
     }
-
     @Override
     public void add(TransferObject data) {
         Task t = new Task(data);
@@ -67,13 +66,11 @@ public class Controller implements IController, TaskObserver {
             nSystem.startTask(t.getID());
         }
     }
-
     @Override
     public void delete(int id)
     {
         try {
             model.delete(id);
-
         } catch (TransformerException | ParserConfigurationException e) {
             displayErrorMessage();
         }
@@ -83,7 +80,6 @@ public class Controller implements IController, TaskObserver {
             }
         }
     }
-
     @Override
     public void load() {
         model.load();
@@ -94,7 +90,7 @@ public class Controller implements IController, TaskObserver {
     }
     @Override
     public void delay(int id, Date newDate) {
-        Task t = model.getCurrentTask(id);
+        Task t = model.get(id);
         try {
             model.delay(id, newDate);
         } catch (TransformerException | ParserConfigurationException e) {

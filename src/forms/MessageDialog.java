@@ -95,13 +95,16 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
      */
     @Override
     public void update(int id) {
-        message.setText(model.getCurrentTask(id).toString());
-        this.id = id;
-        setResizable(false);
-        setAlwaysOnTop(true);
-        setModal(true);
-        pack();
-        setVisible(true);
+        Task t = model.get(id);
+        if(t != null) {
+            message.setText(t.toString());
+            this.id = id;
+            setResizable(false);
+            setAlwaysOnTop(true);
+            setModal(true);
+            pack();
+            setVisible(true);
+        }
     }
     @Override
     public void actionPerformed(ActionEvent e) {

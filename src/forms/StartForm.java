@@ -222,7 +222,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
     }
     /**
      * Asks to confirm deleting the task.
-     * If user confirms, informs to the controller.
+     * If user confirms, informs the controller.
      */
     private void deleteAction() {
         int index = taskList.getSelectedIndex();
@@ -243,7 +243,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
     /**
      * Invokes when the user selects which tasks wants to see.
-     * Changes the view and current state of the app.
+     * Changes the view and current state of the view.
      * For example, if the user wants to see completed tasks then
      * add button will be not available and
      * the new state will be {@link Main#COMPLETED}.

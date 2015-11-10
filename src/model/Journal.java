@@ -29,18 +29,6 @@ public class Journal implements Serializable {
                 return t;
             }
         }
-     /*  if (Main.CURRENT == Main.COMPLETED)
-        {
-            return completedTasks.stream()
-                    .filter(task -> task.getID() == id)
-                    .findFirst().get();
-        }
-        else
-        {
-            return currentTasks.stream()
-                    .filter(task -> task.getID() == id)
-                    .findFirst().get();
-        }*/
        return null;
     }
 
@@ -50,10 +38,29 @@ public class Journal implements Serializable {
         }
     }
 
-    void deleteTask(Task task) {
+    void deleteTask(int id)
+    {
+        for(Task t: completedTasks)
+        {
+            if(t.getID() == id)
+            {
+                completedTasks.remove(t);
+                return;
+            }
+        }
+        for(Task t: currentTasks)
+        {
+            if(t.getID() == id)
+            {
+                currentTasks.remove(t);
+                return;
+            }
+        }
+    }
+   /* void deleteTask(Task task) {
         if (Main.CURRENT == Main.COMPLETED) completedTasks.remove(task);
         else currentTasks.remove(task);
-    }
+    }*/
 
     void delayTask(int id, Date newDate) {
         Task t = currentTasks
@@ -106,9 +113,4 @@ public class Journal implements Serializable {
        else return currentTasks;
     }
 
-    public Task getCurrentTask(int id) {
-        return currentTasks.stream()
-                .filter(task -> task.getID() == id)
-                .findFirst().get();
-    }
 }

@@ -34,12 +34,12 @@ public class Model implements IModel {
 
     @Override
     public void delete(int id) throws TransformerException, ParserConfigurationException {
-        Task t = journal.getTask(id);
-        if(t != null) {
-            journal.deleteTask(t);
+       // Task t = journal.getTask(id);
+        //if(t != null) {
+            journal.deleteTask(id);
             manager.writeJournal(journal);
             notifyListObserver();
-        }
+        //}
     }
 
     @Override
@@ -60,10 +60,6 @@ public class Model implements IModel {
     @Override
     public Task get(int id) {
         return journal.getTask(id);
-    }
-    @Override
-    public Task getCurrentTask(int id) {
-        return journal.getCurrentTask(id);
     }
 
     @Override
