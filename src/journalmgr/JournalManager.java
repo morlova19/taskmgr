@@ -56,12 +56,28 @@ public class JournalManager {
      * Constant for tag id.
      */
     public static final String ID_TAG = "id";
+    /**
+     * Directory in which files with tasks will be stored.
+     */
     private String dir;
+    /**
+     * Name of file in which current tasks will be stored.
+     */
     private String cur_filename;
+    /**
+     * Name of file in which completed tasks will be stored.
+     */
     private String comp_filename;
+    /**
+     * Format of task's date.
+     */
     private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT,
             DateFormat.SHORT, new Locale("ru", "RU"));
 
+    /**
+     * Creates journal manager and fills fields.
+     * @param path directory in which there are files with tasks.
+     */
     public JournalManager(String path) {
         if(new File(path).isDirectory()) {
             if (!new File(path).exists()) {
@@ -77,6 +93,12 @@ public class JournalManager {
         }
     }
 
+    /**
+     * Writes list of tasks.
+     * @param journal journal with lists.
+     * @throws TransformerException
+     * @throws ParserConfigurationException
+     */
     public void writeJournal(Journal journal) throws TransformerException, ParserConfigurationException {
         Vector<Task> tasks = journal.getCurrentTasks();
         write(new File(cur_filename), tasks);
@@ -84,6 +106,14 @@ public class JournalManager {
         write(new File(comp_filename), tasks);
     }
 
+    /**
+     * Reads files and creates journal with lists of tasks.
+     * @return journal.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws ParseException
+     * @throws IOException
+     */
     public Journal readJournal() throws ParserConfigurationException, SAXException, ParseException, IOException {
             Journal journal = new Journal();
 
@@ -112,6 +142,13 @@ public class JournalManager {
             return journal;
     }
 
+    /**
+     * Writes tasks into file.
+     * @param file file in which tasks will be written.
+     * @param tasks tasks that will be written into file.
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     */
     void write(File file, Vector<Task> tasks) throws ParserConfigurationException, TransformerException {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
@@ -145,6 +182,15 @@ public class JournalManager {
             transformer.transform(source, result);
     }
 
+    /**
+     * Reads tasks from file and creates list of tasks.
+     * @param file file from which tasks will be read.
+     * @return  list of tasks.
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws ParseException
+     * @throws SAXException
+     */
     Vector<Task> read(File file) throws ParserConfigurationException, IOException, ParseException, SAXException {
         Vector<Task> tasks = new Vector<>();
         if(!file.exists())
@@ -198,7 +244,6 @@ public class JournalManager {
                 tasks.add(new Task(to));
             }
         return tasks;
-
     }
 
 }
