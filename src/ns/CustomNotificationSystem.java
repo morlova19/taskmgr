@@ -13,12 +13,10 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
 
     private TaskObserver observer;
     private ConcurrentHashMap<Integer, Long> map;
-    private Thread thread;
 
     public CustomNotificationSystem() {
         map = new ConcurrentHashMap<>();
-        thread = new Thread(this);
-        thread.start();
+        new Thread(this).start();
     }
 
     @Override
@@ -49,8 +47,8 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
                 id = iterator.next();
             }
             if (map.get(id) <= currentTime) {
-                observer.update(id);
                 Toolkit.getDefaultToolkit().beep();
+                observer.update(id);
             }
         }
     }
@@ -60,7 +58,7 @@ public class CustomNotificationSystem implements INotificationSystem, Runnable{
         while(!Thread.currentThread().isInterrupted()) {
                 checkTimer();
             try {
-                Thread.currentThread().sleep(5000); //wait 5 seconds
+                Thread.sleep(5000); //wait 5 seconds
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
