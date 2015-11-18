@@ -2,14 +2,19 @@ package forms;
 
 import controller.IController;
 import model.IModel;
-import model.Task;
+import journal.Task;
 import observer.TaskObserver;
+import utils.*;
+import utils.Icon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -26,7 +31,7 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
      */
     private static final String COMPLETE_ACTION = "complete";
     /**
-     * Constant for error message that will be displayed if the entered date is not correct.
+     * Constant for error description_tf that will be displayed if the entered date is not correct.
      */
     public static final String ENTER_DATE_MSG = "Please enter correct date of task";
     /**
@@ -44,15 +49,27 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
     /**
      * Component for displaying the details of the task.
      */
-    private JTextArea message;
+    private JTextArea description_tf;
     /**
      * Component for selecting new date of the task.
      */
-    private JSpinner dateSpinner;
+    private JFormattedTextField dateField;
     /**
-     * Label to display error message if the entered date is not correct.
+     * Label to display error description_tf if the entered date is not correct.
      */
     private JLabel err_label;
+    /**
+     * Component for task's name.
+     */
+    private JTextField name_tf;
+    /**
+     * Component for task's contacts.
+     */
+    private JTextArea contacts_tf;
+    /**
+     * Component for new task's date .
+     */
+    private JLabel date_label;
     /**
      * Provides data for displaying.
      */
@@ -62,6 +79,9 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
      */
     private IController controller;
 
+    /**
+     * Identifier of task about which shows notification.
+     */
     private int id;
     /**
      * Creates new dialog window.
@@ -71,10 +91,9 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
     public MessageDialog(IController c, IModel model) {
         setContentPane(contentPane);
         setTitle("Notification");
-
-        message.setBackground(getBackground());
-
-        dateSpinner.setModel(new SpinnerDateModel());
+        setIconImage(Icon.getIcon());
+        date_label.setText("<html>New date<br>(dd.mm.yyyy hh:mm)</html>");
+        configDateField();
 
         delayButton.setActionCommand(DELAY_ACTION);
         delayButton.addActionListener(this);
@@ -88,6 +107,22 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
+
+    //TODO:javadoc
+    private void configDateField() {
+        MaskFormatter dateFormatter = null;
+        try {
+            dateFormatter = new MaskFormatter("##.##.#### ##:##");
+            dateFormatter.setPlaceholderCharacter('_');
+
+        } catch (ParseException e) {
+
+        }
+        DefaultFormatterFactory dateFormatterFactory = new
+                DefaultFormatterFactory(dateFormatter);
+        dateField.setFormatterFactory(dateFormatterFactory);
+    }
+
     /**
      * Update dialog window.
      * Sets task's details in it.
@@ -97,7 +132,13 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
     public void update(int id) {
         Task t = model.get(id);
         if(t != null) {
-            message.setText(t.toString());
+
+            name_tf.setText(t.getName());
+            description_tf.setText(t.getDescription());
+            String date = DateUtil.format(t.getDate());
+            dateField.setValue(date);
+            contacts_tf.setText(t.getContacts());
+
             this.id = id;
             setResizable(false);
             setAlwaysOnTop(true);
@@ -135,35 +176,44 @@ public class MessageDialog extends JDialog implements TaskObserver, ActionListen
      */
     private void changeViewDate(boolean isCorrectDate) {
         if (isCorrectDate) {
-            configDate("", UIManager.getBorder("Spinner.border"));
+            configDate("", UIManager.getBorder("TextField.border"));
         } else {
             configDate(ENTER_DATE_MSG, BorderFactory.createLineBorder(Color.red));
         }
     }
     /**
-     * Changes appearance of the {@link #dateSpinner} and {@link #err_label}.
+     * Changes appearance of the {@link #dateField} and {@link #err_label}.
      * @param text text that will be set into {@link #err_label}.
-     * @param border border that will be set into {@link #dateSpinner}.
+     * @param border border that will be set into {@link #dateField}.
      */
     private void configDate(String text, Border border) {
         err_label.setForeground(Color.red);
         err_label.setText(text);
-        dateSpinner.setBorder(border);
+        dateField.setBorder(border);
 
     }
     /**
      * Informs controller about that user wants to delay the task.
      */
     private void delay() {
-        Date newDate = (Date) dateSpinner.getValue();
-        boolean isCorrectDate = isCorrectDate(newDate);
+        String newDate = (String) dateField.getValue();
+        Date date = DateUtil.parse(newDate);
 
+        boolean isCorrectDate;
+
+        if(date != null)
+        {
+            isCorrectDate= DateUtil.isCorrect(date);
+        }
+        else {
+            isCorrectDate = false;
+        }
         changeViewDate(isCorrectDate);
 
         if(isCorrectDate)
         {
             if(controller != null) {
-                controller.delay(id, (Date) dateSpinner.getValue());
+                controller.delay(id, date);
             }
             dispose();
         }

@@ -1,13 +1,12 @@
-package journalmgr;
+package journal;
 
-import model.Journal;
-import model.Task;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import to.GeneratorID;
 import to.TransferObject;
+import utils.DateUtil;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,7 +18,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.InvalidPathException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
 
@@ -27,7 +25,7 @@ import java.util.*;
  * Part of taskmgr.
  */
 
-public class JournalManager {
+public class JournalManager{
     /**
      * Constant for tag task.
      */
@@ -68,25 +66,29 @@ public class JournalManager {
      * Name of file in which completed tasks will be stored.
      */
     private String comp_filename;
+
     /**
-     * Format of task's date.
+     * Journal of tasks.
      */
-    private static final DateFormat DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-            DateFormat.SHORT, new Locale("ru", "RU"));
+    private Journal journal;
 
     /**
      * Creates journal manager and fills fields.
      * @param path directory in which there are files with tasks.
      */
     public JournalManager(String path) {
+        if (!new File(path).exists()) {
+            File dir = new File(path);
+            dir.mkdir();
+        }
         if(new File(path).isDirectory()) {
-            if (!new File(path).exists()) {
-                File dir = new File(path);
-                dir.mkdir();
-            }
+          //  if (!new File(path).exists()) {
+                //File dir = new File(path);
+               // dir.mkdir();
+          //  }
             this.dir = path;
-            cur_filename = dir +"/tasks_current.xml";
-            comp_filename = dir +"/tasks_completed.xml";
+            cur_filename = this.dir +"/tasks_current.xml";
+            comp_filename = this.dir +"/tasks_completed.xml";
         }
         else {
             throw new InvalidPathException(path,"Path is not directory");
@@ -94,12 +96,70 @@ public class JournalManager {
     }
 
     /**
-     * Writes list of tasks.
-     * @param journal journal with lists.
+     * Loads journal.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws ParseException
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public void loadJournal() throws ParserConfigurationException, SAXException, ParseException, IOException, TransformerException {
+        journal = readJournal();
+        journal.reload();
+        writeJournal();
+    }
+    /**
+     * Adds task and rewrites journal.
+     * @param task new task
      * @throws TransformerException
      * @throws ParserConfigurationException
      */
-    public void writeJournal(Journal journal) throws TransformerException, ParserConfigurationException {
+    public void add(Task task) throws TransformerException, ParserConfigurationException {
+        if(task != null) {
+            journal.addTask(task);
+            writeJournal();
+        }
+    }
+    //TODO:javadoc
+    public void delete(int id) throws TransformerException, ParserConfigurationException {
+        journal.deleteTask(id);
+        writeJournal();
+    }
+    //TODO:javadoc
+    public Vector<Task> getTasks() {
+        return journal.getTasks();
+    }
+    //TODO:javadoc
+    public Task get(int id) {
+        return journal.getTask(id);
+    }
+    //TODO:javadoc
+    public void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException {
+        journal.delayTask(id, newDate);
+        writeJournal();
+    }
+    //TODO:javadoc
+    public void complete(int id) throws TransformerException, ParserConfigurationException {
+        journal.setCompleted(journal.getTask(id));
+        writeJournal();
+    }
+    //TODO:javadoc
+    public Vector<Integer> getIDs() {
+        Vector<Integer> idVector = new Vector<>();
+        Vector<Task> tasks = journal.getTasks();
+        for(Task t: tasks) {
+            idVector.add(t.getID());
+        }
+        return idVector;
+
+    }
+    /**
+     * Writes list of tasks.
+     //* @param journal journal with lists.
+     * @throws TransformerException
+     * @throws ParserConfigurationException
+     */
+    public void writeJournal(/*Journal journal*/) throws TransformerException, ParserConfigurationException {
         Vector<Task> tasks = journal.getCurrentTasks();
         write(new File(cur_filename), tasks);
         tasks = journal.getCompletedTasks();
@@ -114,7 +174,7 @@ public class JournalManager {
      * @throws ParseException
      * @throws IOException
      */
-    public Journal readJournal() throws ParserConfigurationException, SAXException, ParseException, IOException {
+    private Journal readJournal() throws ParserConfigurationException, SAXException, ParseException, IOException {
             Journal journal = new Journal();
 
             Vector<Task> cur_tasks = read(new File(cur_filename));
@@ -149,7 +209,7 @@ public class JournalManager {
      * @throws ParserConfigurationException
      * @throws TransformerException
      */
-    void write(File file, Vector<Task> tasks) throws ParserConfigurationException, TransformerException {
+    private void write(File file, Vector<Task> tasks) throws ParserConfigurationException, TransformerException {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document document = builder.newDocument();
@@ -165,7 +225,7 @@ public class JournalManager {
                 Element idEl = document.createElement(ID_TAG);
                 nameEl.setTextContent(t.getName());
                 descEl.setTextContent(t.getDescription());
-                dateEl.setTextContent(DATE_FORMAT.format(t.getDate()));
+                dateEl.setTextContent(DateUtil.format(t.getDate()));
                 contactsEl.setTextContent(t.getContacts());
                 idEl.setTextContent(String.valueOf(t.getID()));
                 taskElement.appendChild(nameEl);
@@ -191,7 +251,7 @@ public class JournalManager {
      * @throws ParseException
      * @throws SAXException
      */
-    Vector<Task> read(File file) throws ParserConfigurationException, IOException, ParseException, SAXException {
+    private Vector<Task> read(File file) throws ParserConfigurationException, IOException, ParseException, SAXException {
         Vector<Task> tasks = new Vector<>();
         if(!file.exists())
         {
@@ -223,7 +283,7 @@ public class JournalManager {
                             desc = taskFields.item(j).getTextContent();
                             break;
                         case DATE_TAG:
-                            date = DATE_FORMAT.parse(taskFields.item(j).getTextContent());
+                            date = DateUtil.parse(taskFields.item(j).getTextContent());
                             break;
                         case CONTACTS_TAG:
                             contacts = taskFields.item(j).getTextContent();

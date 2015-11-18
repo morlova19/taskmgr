@@ -4,16 +4,14 @@ import controller.IController;
 import listeners.CustomMouseListener;
 import listeners.CustomWindowListener;
 import model.IModel;
-import model.Task;
+import journal.Task;
 import observer.ListObserver;
 import start.Main;
+import utils.Icon;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
@@ -127,7 +125,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
 
         setContentPane(mainPanel);
         setTitle(TASK_MANAGER);
-        setIconImage(getIcon());
+        setIconImage(Icon.getIcon());
         taskList.setFixedCellWidth(200);
         taskList.setVisibleRowCount(15);
         configButton(addButton, ADD_ACTION);
@@ -164,7 +162,7 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
      */
     private void configTray() {
         tray = SystemTray.getSystemTray();
-        Image img = getIcon();
+        Image img = Icon.getIcon();
         PopupMenu popupMenu = new PopupMenu();
         MenuItem exitItem = new MenuItem("Exit");
         MenuItem openItem = new MenuItem("Open");
@@ -178,40 +176,6 @@ public class StartForm extends JFrame implements ActionListener, CustomMouseList
         trayIcon.setImageAutoSize(true);
     }
 
-    /**
-     * Creates icon of the app.
-     * @return icon.
-     */
-    private Image getIcon() {
-        Image img;
-        String path = "images/icon.png";
-        try {
-            img = ImageIO.read(ClassLoader.getSystemResourceAsStream(path));
-        } catch (IOException | IllegalArgumentException e) {
-            img = drawIcon();
-        }
-        return img;
-    }
-    /**
-     * Draws icon of app if it cannot be read from resource file.
-     * @return icon.
-     */
-    private Image drawIcon() {
-        Image img;
-        int w = 35;
-        int h = w;
-        img = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gr = ((BufferedImage)img).createGraphics();
-        gr.setComposite(AlphaComposite.Clear);
-        gr.fillRect(0, 0, w, h);
-        gr.setComposite(AlphaComposite.SrcOver);
-        gr.setColor(Color.BLUE);
-        gr.fillOval(0,0,w,h);
-        gr.setFont(new Font("Arial", Font.BOLD, 18));
-        gr.setColor(Color.YELLOW);
-        gr.drawString("TM",5,24);
-        return img;
-    }
     /**
      * Removes icon from system tray and sets this form visible.
      */

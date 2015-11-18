@@ -3,12 +3,11 @@ package start;
 import controller.Controller;
 import controller.IController;
 import model.IModel;
-import model.Journal;
-import journalmgr.JournalManager;
+import journal.Journal;
+import journal.JournalManager;
 import model.Model;
 import ns.CustomNotificationSystem;
 import ns.INotificationSystem;
-import ns.NotificationSystem;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
@@ -30,12 +29,11 @@ public class Main {
             JOptionPane.showMessageDialog(new JFrame(),"Task manager is already running.");
             System.exit(1);
         }
-        String path = System.getProperty("user.home") + "/taskmgr";
-        Journal journal = null;
+        String path = System.getProperty("user.home") + "taskmgr/";
         JournalManager manager = null;
         try {
             manager = new JournalManager(path);
-            journal = manager.readJournal();
+            manager.loadJournal();
         }
         catch (SAXException | ParseException | ParserConfigurationException e) {
             showErrorMessage("Cannot read file with the tasks.");
@@ -46,18 +44,13 @@ public class Main {
         catch (InvalidPathException e)
         {
            showErrorMessage(e.getMessage());
+        } catch (TransformerException e) {
+            showErrorMessage(e.getMessage());
         }
-        if(journal != null) {
-            journal.reload();
-            try {
-                manager.writeJournal(journal);
-            } catch (TransformerException | ParserConfigurationException e) {
-                showErrorMessage("Cannot write to file with the tasks.");
-            }
-            IModel model = new Model(manager, journal);
+
+            IModel model = new Model(manager/*, journal*/);
             INotificationSystem nSystem = new CustomNotificationSystem();
             IController controller = new Controller(model, nSystem);
-        }
     }
     private static void showErrorMessage(String err) {
         JOptionPane.showMessageDialog(new JFrame(),

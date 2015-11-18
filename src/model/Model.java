@@ -1,6 +1,7 @@
 package model;
 
-import journalmgr.JournalManager;
+import journal.JournalManager;
+import journal.Task;
 import observer.ListObserver;
 import observer.TaskObserver;
 
@@ -14,37 +15,28 @@ import java.util.Vector;
  */
 public class Model implements IModel {
 
-    private Journal journal;
     private JournalManager manager;
     private ListObserver lObserver;
     private TaskObserver tObserver;
 
-    public Model(JournalManager manager, Journal journal) {
+    public Model(JournalManager manager) {
         this.manager = manager;
-        this.journal = journal;
     }
     @Override
     public void add(Task task) throws TransformerException, ParserConfigurationException {
         if(task != null) {
-            journal.addTask(task);
-            manager.writeJournal(journal);
+            manager.add(task);
             notifyListObserver();
         }
     }
-
     @Override
     public void delete(int id) throws TransformerException, ParserConfigurationException {
-       // Task t = journal.getTask(id);
-        //if(t != null) {
-            journal.deleteTask(id);
-            manager.writeJournal(journal);
-            notifyListObserver();
-        //}
+        manager.delete(id);
+        notifyListObserver();
     }
-
     @Override
     public Vector<Task> getData() {
-        return journal.getTasks();
+        return manager.getTasks();
     }
 
     @Override
@@ -56,10 +48,9 @@ public class Model implements IModel {
     public void registerTaskObserver(TaskObserver o) {
         tObserver = o;
     }
-
     @Override
     public Task get(int id) {
-        return journal.getTask(id);
+        return manager.get(id);
     }
 
     @Override
@@ -74,26 +65,18 @@ public class Model implements IModel {
 
     @Override
     public void delay(int id, Date newDate) throws TransformerException, ParserConfigurationException {
-        journal.delayTask(id, newDate);
-        manager.writeJournal(journal);
+        manager.delay(id, newDate);
     }
 
     @Override
     public void complete(int id) throws TransformerException, ParserConfigurationException {
-        journal.setCompleted(journal.getTask(id));
-        manager.writeJournal(journal);
+        manager.complete(id);
         notifyListObserver();
 
     }
-
     @Override
     public Vector<Integer> getIDs() {
-        Vector<Integer> idVector = new Vector<>();
-        Vector<Task> tasks = journal.getTasks();
-        for(Task t: tasks) {
-            idVector.add(t.getID());
-        }
-        return idVector;
+        return manager.getIDs();
     }
 
     private void notifyListObserver() {

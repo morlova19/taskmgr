@@ -11,9 +11,9 @@
     <file url="file://$PROJECT_DIR$/src/forms/ShowTaskDialog.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/StartForm.form" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/forms/StartForm.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/journal/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/model/IModel.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/model/Model.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/model/Task.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/ListObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/observer/TaskObserver.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/start/Main.java" charset="UTF-8" />

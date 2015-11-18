@@ -1,4 +1,4 @@
-package model;
+package journal;
 
 import start.Main;
 

@@ -1,5 +1,6 @@
 package model;
 
+import journal.Task;
 import observer.ListObserver;
 import observer.TaskObserver;
 

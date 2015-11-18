@@ -2,12 +2,18 @@ package forms;
 
 import controller.IController;
 import model.IModel;
-import model.Task;
+import journal.Task;
 import observer.TaskObserver;
+import utils.DateUtil;
+import utils.Icon;
 
 import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * GUI to display the information about the task.
@@ -45,11 +51,14 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
     /**
      *  Field to display task's date.
      */
-    private JSpinner date_spinner;
+    private JFormattedTextField dateField;
     /**
      * Field to display contacts.
      */
     private JTextArea contacts_tf;
+
+
+    private JLabel date_label;
     /**
      * Provides methods to work with data.
      */
@@ -59,6 +68,7 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
      */
     IModel m;
 
+
     /**
      * Creates and displays dialog.
      * @param c controller.
@@ -66,7 +76,12 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
      */
     public ShowTaskDialog(IController c, IModel m, int id) {
         setContentPane(contentPane);
-        date_spinner.setModel(new SpinnerDateModel());
+
+        setTitle("Task dialog");
+        setIconImage(Icon.getIcon());
+
+        date_label.setText("<html>Date<br>(dd.mm.yyyy hh:mm)</html>");
+        configDateField();
 
         configButton(buttonOK, OK_ACTION);
         configButton(buttonCancel, CANCEL_ACTION);
@@ -86,6 +101,25 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
         }
 
     }
+
+    /**
+     * Configures {@link #dateField}.
+     * Sets format.
+     */
+    private void configDateField() {
+        MaskFormatter dateFormatter = null;
+        try {
+            dateFormatter = new MaskFormatter("##.##.#### ##:##");
+            dateFormatter.setPlaceholderCharacter('_');
+
+        } catch (ParseException e) {
+
+        }
+        DefaultFormatterFactory dateFormatterFactory = new
+                DefaultFormatterFactory(dateFormatter);
+        dateField.setFormatterFactory(dateFormatterFactory);
+    }
+
     /**
      * Configures given button.
      * Adds ActionListener and sets actionCommand.
@@ -118,14 +152,17 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
         if(m != null) {
             Task t = m.get(id);
             if (t != null) {
-                setTitle(t.getName());
                 name_tf.setText(t.getName());
                 description_tf.setText(t.getDescription());
-                date_spinner.setValue(t.getDate());
+
+                String date = DateUtil.format(t.getDate());
+                dateField.setValue(date);
+              //  date_spinner.setValue(t.getDate());
                 contacts_tf.setText(t.getContacts());
                 name_tf.setEditable(false);
                 description_tf.setEditable(false);
-                ((JSpinner.DefaultEditor) date_spinner.getEditor()).getTextField().setEditable(false);
+                dateField.setEditable(false);
+             //   ((JSpinner.DefaultEditor) date_spinner.getEditor()).getTextField().setEditable(false);
                 contacts_tf.setEditable(false);
                 pack();
                 setVisible(true);
@@ -133,4 +170,5 @@ public class ShowTaskDialog extends JDialog implements ActionListener, TaskObser
 
         }
     }
+
 }

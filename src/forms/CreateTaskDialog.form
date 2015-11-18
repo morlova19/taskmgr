@@ -74,19 +74,14 @@
             </constraints>
             <properties/>
           </component>
-          <component id="4c913" class="javax.swing.JLabel">
+          <component id="4c913" class="javax.swing.JLabel" binding="date_label">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <labelFor value="abafb"/>
               <text value="Date"/>
             </properties>
-          </component>
-          <component id="51769" class="javax.swing.JSpinner" binding="date_spinner">
-            <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
           </component>
           <component id="440a1" class="javax.swing.JLabel" binding="name_err_label">
             <constraints>
@@ -153,6 +148,14 @@
               <labelFor value="d486c"/>
               <text value="Contacts"/>
             </properties>
+          </component>
+          <component id="abafb" class="javax.swing.JFormattedTextField" binding="dateField">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties/>
           </component>
         </children>
       </grid>

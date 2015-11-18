@@ -3,7 +3,7 @@ package controller;
 import forms.MessageDialog;
 import forms.StartForm;
 import model.IModel;
-import model.Task;
+import journal.Task;
 import ns.INotificationSystem;
 import observer.TaskObserver;
 import start.Main;
@@ -60,8 +60,7 @@ public class Controller implements IController, TaskObserver {
         }
     }
     @Override
-    public void delete(int id)
-    {
+    public void delete(int id) {
         try {
             model.delete(id);
         } catch (TransformerException | ParserConfigurationException e) {
@@ -94,8 +93,7 @@ public class Controller implements IController, TaskObserver {
         }
     }
     @Override
-    public void complete(int id)
-    {
+    public void complete(int id) {
         try {
             model.complete(id);
         } catch (TransformerException | ParserConfigurationException e) {
@@ -105,7 +103,6 @@ public class Controller implements IController, TaskObserver {
             nSystem.cancelTask(id);
         }
     }
-
     @Override
     public void update(int id) {
         TaskObserver mObserver = new MessageDialog(this, model);

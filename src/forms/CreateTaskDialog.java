@@ -3,12 +3,18 @@ package forms;
 import controller.IController;
 import to.GeneratorID;
 import to.TransferObject;
+import utils.*;
+import utils.Icon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -28,11 +34,11 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
     /**
      * Constant for actionCommand.
      */
-    private final String OK_ACTION = "OK";
+    private static final String OK_ACTION = "OK";
     /**
      * Constant for actionCommand.
      */
-    private final String CANCEL_ACTION = "Cancel";
+    private static final String CANCEL_ACTION = "Cancel";
     /**
      * Container for components.
      */
@@ -56,7 +62,7 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
     /**
      * Field for entering date of execution of task.
      */
-    private JSpinner date_spinner;
+    private JFormattedTextField dateField;
     /**
      * Field for entering contacts.
      */
@@ -72,6 +78,10 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
      */
     private JLabel name_err_label;
     /**
+     * Label for {@link #dateField}.
+     */
+    private JLabel date_label;
+    /**
      * Provides methods to work with data.
      */
     private IController controller;
@@ -85,16 +95,34 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
         }
         setContentPane(contentPane);
         setTitle("New task");
-
+        setIconImage(Icon.getIcon());
+        date_label.setText("<html>Date<br>(dd.mm.yyyy hh:mm)</html>");
         configButton(buttonOK, OK_ACTION);
         configButton(buttonCancel, CANCEL_ACTION);
 
-        date_spinner.setModel(new SpinnerDateModel());
+        configDateField();
 
         setLocationRelativeTo(null);
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
+    }
+    //TODO:javadoc
+    private void configDateField() {
+        MaskFormatter dateFormatter = null;
+        try {
+            dateFormatter = new MaskFormatter("##.##.#### ##:##");
+            dateFormatter.setPlaceholderCharacter('_');
+
+        } catch (ParseException e) {
+
+        }
+        DefaultFormatterFactory dateFormatterFactory = new
+                DefaultFormatterFactory(dateFormatter);
+        dateField.setFormatterFactory(dateFormatterFactory);
+
+        String date = DateUtil.format(new Date());
+        dateField.setValue(date);
     }
 
     /**
@@ -127,12 +155,28 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
      */
     private void add() {
         String name = name_tf.getText().trim();
-        Date date = (Date) date_spinner.getValue();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        sdf.setLenient(false);
+
+        //Date date = (Date) dateField.getValue();
         String desc = description_tf.getText().trim();
         String contacts = contacts_tf.getText().trim();
 
         boolean isCorrectName = isCorrectName(name);
-        boolean isCorrectDate = isCorrectDate(date);
+
+        boolean isCorrectDate;
+        Date date = null;
+        date = DateUtil.parse((String)dateField.getValue());
+        if(date == null)
+        {
+            isCorrectDate = false;
+        }
+        else
+        {
+            isCorrectDate = DateUtil.isCorrect(date);
+        }
+           // date = sdf.parse((String)dateField.getValue());
 
         if(isCorrectName && isCorrectDate)
         {
@@ -145,7 +189,7 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
         else {
             changeView(isCorrectName, isCorrectDate);
         }
-        pack();
+
     }
 
     /**
@@ -167,7 +211,7 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
      */
     private void changeViewDate(boolean isCorrectDate) {
         if (isCorrectDate) {
-            configDate("", UIManager.getBorder("Spinner.border"));
+            configDate("", UIManager.getBorder("TextField.border"));
         } else {
             configDate(ENTER_DATE_MSG, BorderFactory.createLineBorder(Color.red));
         }
@@ -230,13 +274,14 @@ public class CreateTaskDialog extends JDialog implements ActionListener {
         name_tf.setBorder(border);
     }
     /**
-     * Changes appearance of the {@link #date_spinner} and {@link #date_err_label}.
+     * Changes appearance of the {@link #dateField} and {@link #date_err_label}.
      * @param text text that will be set into {@link #date_err_label}.
-     * @param border border that will be set into {@link #date_spinner}.
+     * @param border border that will be set into {@link #dateField}.
      */
     private void configDate(String text, Border border) {
         date_err_label.setForeground(Color.red);
         date_err_label.setText(text);
-        date_spinner.setBorder(border);
+        dateField.setBorder(border);
     }
+
 }
